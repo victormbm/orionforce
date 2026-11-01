@@ -13,8 +13,8 @@ import {
 } from "@/data/attributes";
 import { characterRepo, type Snapshot } from "@/lib/character";
 import { formatValue, parseNumber } from "@/lib/format";
-import { type PublicMember } from "@/lib/members";
-import { getSession } from "@/lib/session";
+import { membersRepo, type PublicMember } from "@/lib/members";
+import { getSession, setSession } from "@/lib/session";
 
 type Feedback = { type: "ok" | "error"; text: string } | null;
 
@@ -33,6 +33,7 @@ export default function CharacterPage() {
   const [showAll, setShowAll] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [busy, setBusy] = useState(false);
+  const [discord, setDiscord] = useState("");
 
   useEffect(() => {
     const session = getSession();
@@ -41,6 +42,7 @@ export default function CharacterPage() {
       return;
     }
     setMe(session);
+    setDiscord(session.discord ?? "");
     Promise.all([
       characterRepo.get(session.id),
       characterRepo.listSnapshots(session.id),
@@ -132,6 +134,14 @@ export default function CharacterPage() {
     setSnapshots(await characterRepo.listSnapshots(me.id));
   };
 
+  const handleSaveDiscord = async () => {
+    if (!me) return;
+    const updated = await membersRepo.setDiscord(me.id, discord);
+    setSession(updated);
+    setMe(updated);
+    setFeedback({ type: "ok", text: "Discord atualizado!" });
+  };
+
   if (!me) return null;
 
   const myClass = getClass(me.classId);
@@ -188,6 +198,49 @@ export default function CharacterPage() {
                 {formatValue(currentHp)}
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* Minha conta Discord */}
+        <section className="of-section mt-4 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="of-label" style={{ color: "var(--of-primary)" }}>
+                Minha conta Discord
+              </h2>
+              <p
+                className="mt-1 text-xs"
+                style={{ color: "var(--of-text-muted)" }}
+              >
+                Informe sua tag para a liderança te reconhecer. (A vinculação
+                automática via OAuth entra numa fase futura.)
+              </p>
+            </div>
+            <span
+              className="of-role-pill"
+              style={{
+                background: me.discord ? "#30a46c" : "#8fa0bd",
+              }}
+            >
+              {me.discord ? "Vinculada" : "Não vinculada"}
+            </span>
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <input
+              className="of-input"
+              style={{ maxWidth: 280 }}
+              placeholder="Ex: seunick ou seunick#0001"
+              value={discord}
+              onChange={(e) => setDiscord(e.target.value)}
+            />
+            <button
+              className="of-cta"
+              style={{ width: "auto", marginTop: 0 }}
+              onClick={handleSaveDiscord}
+              disabled={(discord.trim() || "") === (me.discord ?? "")}
+            >
+              Salvar Discord
+            </button>
           </div>
         </section>
 

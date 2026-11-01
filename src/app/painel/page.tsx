@@ -229,6 +229,14 @@ export default function PanelPage() {
                           ⚡ {formatValue(poder)}
                         </p>
                       )}
+                      {m.discord && (
+                        <p
+                          className="truncate text-xs"
+                          style={{ color: "#5865F2" }}
+                        >
+                          🎮 {m.discord}
+                        </p>
+                      )}
                     </div>
                     <span
                       className="of-role-pill shrink-0"
