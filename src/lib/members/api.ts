@@ -61,6 +61,12 @@ export const apiMembersRepo: MembersRepository = {
       body: JSON.stringify({ role }),
     }),
 
+  setStatus: (id, status) =>
+    request<PublicMember>(`/api/members/${id}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    }),
+
   remove: async (id) => {
     await request<unknown>(`/api/members/${id}`, { method: "DELETE" });
   },

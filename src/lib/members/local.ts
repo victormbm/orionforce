@@ -58,13 +58,16 @@ export const localMembersRepo: MembersRepository = {
       );
     }
 
+    const first = all.length === 0;
     const member: Member = {
       id: uid(),
       nickname: nick,
       pinHash: await hashPin(pin),
       classId,
-      // Bootstrap: o primeiro cadastro da guild vira líder; os demais, recrutas.
-      guildRole: all.length === 0 ? "lider" : "recruta",
+      // Bootstrap: o primeiro cadastro vira líder já aprovado; os demais
+      // entram como recruta pendente (precisam de aprovação).
+      guildRole: first ? "lider" : "recruta",
+      status: first ? "aprovado" : "pendente",
       createdAt: new Date().toISOString(),
     };
     writeAll([...all, member]);
@@ -85,6 +88,12 @@ export const localMembersRepo: MembersRepository = {
     if (member.pinHash !== (await hashPin(pin))) {
       throw new AuthError("WRONG_PIN", "PIN incorreto. Tente novamente.");
     }
+    if (member.status === "pendente") {
+      throw new AuthError(
+        "PENDING",
+        "Seu cadastro está aguardando aprovação da liderança."
+      );
+    }
     return toPublic(member);
   },
 
@@ -97,6 +106,15 @@ export const localMembersRepo: MembersRepository = {
     const member = all.find((m) => m.id === id);
     if (!member) throw new AuthError("NOT_FOUND", "Membro não encontrado.");
     member.guildRole = role;
+    writeAll(all);
+    return toPublic(member);
+  },
+
+  async setStatus(id, status) {
+    const all = readAll();
+    const member = all.find((m) => m.id === id);
+    if (!member) throw new AuthError("NOT_FOUND", "Membro não encontrado.");
+    member.status = status;
     writeAll(all);
     return toPublic(member);
   },

@@ -22,16 +22,19 @@ export async function POST(req: Request) {
     );
   }
 
-  // Bootstrap: primeiro cadastro da guild vira líder.
+  // Bootstrap: primeiro cadastro vira líder já aprovado; os demais entram
+  // pendentes (precisam de aprovação da liderança).
   const count = await sql`SELECT count(*)::int AS n FROM members`;
-  const role = count[0].n === 0 ? "lider" : "recruta";
+  const first = count[0].n === 0;
+  const role = first ? "lider" : "recruta";
+  const status = first ? "aprovado" : "pendente";
   const pinHash = await hashPin(String(pin));
 
   const rows = await sql`
-    INSERT INTO members (nickname, pin_hash, class_id, guild_role)
-    VALUES (${nick}, ${pinHash}, ${classId}, ${role})
+    INSERT INTO members (nickname, pin_hash, class_id, guild_role, status)
+    VALUES (${nick}, ${pinHash}, ${classId}, ${role}, ${status})
     RETURNING id, nickname, class_id AS "classId", guild_role AS "guildRole",
-              discord, created_at AS "createdAt"
+              status, discord, created_at AS "createdAt"
   `;
   return NextResponse.json(rows[0], { status: 201 });
 }

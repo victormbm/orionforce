@@ -5,7 +5,7 @@ export async function GET() {
   const sql = getSql();
   const rows = await sql`
     SELECT id, nickname, class_id AS "classId", guild_role AS "guildRole",
-           discord, created_at AS "createdAt"
+           status, discord, created_at AS "createdAt"
     FROM members
     ORDER BY created_at ASC
   `;

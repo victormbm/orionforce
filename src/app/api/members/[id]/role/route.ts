@@ -19,7 +19,7 @@ export async function PATCH(
   const rows = await sql`
     UPDATE members SET guild_role = ${role} WHERE id = ${id}
     RETURNING id, nickname, class_id AS "classId", guild_role AS "guildRole",
-              discord, created_at AS "createdAt"
+              status, discord, created_at AS "createdAt"
   `;
   if (!rows.length) {
     return NextResponse.json(

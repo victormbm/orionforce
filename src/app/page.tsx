@@ -60,10 +60,12 @@ export default function AuthPage() {
 
   const handleRegister = async () => {
     const member = await membersRepo.register({ nickname, pin, classId });
-    const cls = getClass(member.classId);
+    const approved = member.status === "aprovado";
     setFeedback({
       type: "ok",
-      text: `Cadastro concluído! ${member.nickname} (${cls?.name}) já pode acessar.`,
+      text: approved
+        ? `Cadastro concluído, ${member.nickname}! Você já pode acessar.`
+        : `Cadastro enviado, ${member.nickname}! Aguarde a aprovação da liderança para acessar.`,
     });
     setMode("login");
     setPin("");

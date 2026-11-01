@@ -41,7 +41,10 @@ export default function LeadershipPage() {
     await reload();
   };
 
-  const approve = (id: string) => changeRole(id, "membro");
+  const approve = async (id: string) => {
+    await membersRepo.setStatus(id, "aprovado");
+    await reload();
+  };
 
   const remove = async (id: string, nickname: string) => {
     if (!confirm(`Remover ${nickname} da guild?`)) return;
@@ -49,7 +52,8 @@ export default function LeadershipPage() {
     await reload();
   };
 
-  const recruits = members.filter((m) => m.guildRole === "recruta");
+  const pendings = members.filter((m) => m.status === "pendente");
+  const approved = members.filter((m) => m.status === "aprovado");
 
   return (
     <div className="relative z-10 min-h-screen pb-16">
@@ -63,25 +67,25 @@ export default function LeadershipPage() {
           Área da Liderança
         </h1>
         <p className="mt-1 text-sm" style={{ color: "var(--of-text-soft)" }}>
-          Aprove recrutas, gerencie cargos e o quadro de membros.
+          Aprove cadastros, gerencie cargos e o quadro de membros.
         </p>
 
-        {/* Recrutas pendentes */}
+        {/* Cadastros pendentes de aprovação */}
         <section className="of-section mt-6 p-5">
           <h2 className="of-label mb-4" style={{ color: "var(--of-gold)" }}>
-            Recrutas pendentes ({recruits.length})
+            Cadastros pendentes ({pendings.length})
           </h2>
           {loading ? (
             <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
               Carregando...
             </p>
-          ) : recruits.length === 0 ? (
+          ) : pendings.length === 0 ? (
             <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
-              Nenhum recruta aguardando aprovação. 🎉
+              Nenhum cadastro aguardando aprovação. 🎉
             </p>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {recruits.map((m) => {
+              {pendings.map((m) => {
                 const cls = getClass(m.classId);
                 return (
                   <div key={m.id} className="of-member">
@@ -99,17 +103,26 @@ export default function LeadershipPage() {
                       >
                         {cls?.name ?? m.classId}
                       </p>
+                      <div className="mt-1.5 flex gap-2">
+                        <button
+                          className="of-btn-ghost"
+                          style={{
+                            borderColor: "#30a46c",
+                            color: "#30a46c",
+                          }}
+                          onClick={() => approve(m.id)}
+                        >
+                          Aprovar
+                        </button>
+                        <button
+                          className="of-btn-ghost"
+                          style={{ borderColor: "#e5484d", color: "#e5484d" }}
+                          onClick={() => remove(m.id, m.nickname)}
+                        >
+                          Recusar
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      className="of-btn-ghost shrink-0"
-                      style={{
-                        borderColor: "var(--of-primary)",
-                        color: "var(--of-primary)",
-                      }}
-                      onClick={() => approve(m.id)}
-                    >
-                      Aprovar
-                    </button>
                   </div>
                 );
               })}
@@ -117,13 +130,13 @@ export default function LeadershipPage() {
           )}
         </section>
 
-        {/* Todos os membros */}
+        {/* Quadro de membros aprovados */}
         <section className="of-section mt-6 p-5">
           <h2 className="of-label mb-4" style={{ color: "var(--of-primary)" }}>
-            Quadro de membros ({members.length})
+            Quadro de membros ({approved.length})
           </h2>
           <div className="flex flex-col gap-3">
-            {members.map((m) => {
+            {approved.map((m) => {
               const cls = getClass(m.classId);
               const isSelf = m.id === me.id;
               return (

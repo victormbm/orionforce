@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS members (
   class_id    TEXT NOT NULL,
   guild_role  TEXT NOT NULL DEFAULT 'recruta'
               CHECK (guild_role IN ('recruta', 'membro', 'oficial', 'lider')),
+  status      TEXT NOT NULL DEFAULT 'pendente'
+              CHECK (status IN ('pendente', 'aprovado')),
   discord     TEXT,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );

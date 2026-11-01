@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
   const rows = await sql`
     SELECT id, nickname, pin_hash, class_id AS "classId",
-           guild_role AS "guildRole", discord, created_at AS "createdAt"
+           guild_role AS "guildRole", status, discord, created_at AS "createdAt"
     FROM members
     WHERE lower(nickname) = lower(${nick})
   `;
@@ -24,6 +24,15 @@ export async function POST(req: Request) {
     return NextResponse.json(
       { code: "WRONG_PIN", message: "PIN incorreto. Tente novamente." },
       { status: 401 }
+    );
+  }
+  if (member.status === "pendente") {
+    return NextResponse.json(
+      {
+        code: "PENDING",
+        message: "Seu cadastro está aguardando aprovação da liderança.",
+      },
+      { status: 403 }
     );
   }
 

@@ -54,7 +54,7 @@ export default function GvgPage() {
       gvgRepo.getAssignments(),
     ])
       .then(([list, sums, assigns]) => {
-        setMembers(list);
+        setMembers(list.filter((m) => m.status === "aprovado"));
         setSummaries(sums);
         setAssignments(assigns);
       })

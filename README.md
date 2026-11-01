@@ -153,7 +153,10 @@ Já implementado:
 - **Discord (manual)**: vínculo da tag no "Meu Personagem" + exibição no roster
 - **Escalação de GvG**: arrastar-e-soltar (Disponíveis/Elite/Secundária) com
   poder total e composição por função de cada grupo (admin)
+- **Aprovação de cadastro**: novo cadastro entra `pendente` e só acessa após a
+  liderança aprovar (impede entrada de estranhos); admin pode aprovar/recusar/remover
 - Controle de acesso por cargo (oficial/líder) nas rotas de gestão
+- Persistência no **Neon (Postgres)** em todos os módulos
 
 Próximas fases (dependem de backend/serviços — ficam para depois do Vercel):
 
@@ -162,6 +165,20 @@ Próximas fases (dependem de backend/serviços — ficam para depois do Vercel):
 - **Prazo de atualização semanal** — cobrança automática de atributos
 - **Calculadoras** — RAW DEF e simulador de dano PvP
 - **Perfis por classe** — múltiplas builds por membro (ex: PvP x PvE)
+
+## 👑 Contas de administrador
+
+Dois admins (líder, já aprovados) são criados pelo script
+[`scripts/seed-admins.mjs`](scripts/seed-admins.mjs): **Korutan** e **Marcelao**.
+PIN inicial: **1234** (defina outro com `ADMIN_PIN=xxxx` ao rodar o script).
+
+```bash
+# rodar uma vez (adiciona a coluna de status e cria/atualiza os admins)
+DATABASE_URL="...sua string..." node scripts/seed-admins.mjs
+```
+
+> Troque o PIN padrão assim que possível. Ainda não há tela de "trocar PIN" —
+> dá para rodar o script de novo com `ADMIN_PIN` diferente.
 
 ## 🔒 Nota de segurança (para produção)
 

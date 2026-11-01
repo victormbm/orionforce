@@ -49,20 +49,25 @@ export default function PanelPage() {
       .finally(() => setLoading(false));
   }, [router]);
 
+  const approved = useMemo(
+    () => members.filter((m) => m.status === "aprovado"),
+    [members]
+  );
+
   const stats = useMemo(() => {
     const byRole: Record<Role, number> = { DPS: 0, SUP: 0, MDPS: 0, TANK: 0 };
     let poderTotal = 0;
-    for (const m of members) {
+    for (const m of approved) {
       const role = getClass(m.classId)?.role;
       if (role) byRole[role] += 1;
       poderTotal += summaries[m.id]?.poder ?? 0;
     }
-    return { total: members.length, byRole, poderTotal };
-  }, [members, summaries]);
+    return { total: approved.length, byRole, poderTotal };
+  }, [approved, summaries]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return members
+    return approved
       .filter((m) => {
         const cls = getClass(m.classId);
         const matchRole = roleFilter === "ALL" || cls?.role === roleFilter;
@@ -75,7 +80,7 @@ export default function PanelPage() {
       .sort(
         (a, b) => (summaries[b.id]?.poder ?? 0) - (summaries[a.id]?.poder ?? 0)
       );
-  }, [members, search, roleFilter, summaries]);
+  }, [approved, search, roleFilter, summaries]);
 
   if (!me) return null;
 

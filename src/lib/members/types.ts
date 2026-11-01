@@ -9,6 +9,9 @@
 
 export type GuildRole = "recruta" | "membro" | "oficial" | "lider";
 
+/** Situação do cadastro: aguardando aprovação ou liberado. */
+export type MemberStatus = "pendente" | "aprovado";
+
 /** Registro completo do membro (inclui o hash do PIN — nunca exposto na UI). */
 export interface Member {
   id: string;
@@ -16,6 +19,7 @@ export interface Member {
   pinHash: string;
   classId: string;
   guildRole: GuildRole;
+  status: MemberStatus;
   /** Tag do Discord (ex: "nick#0001" ou @usuario). Opcional. */
   discord?: string;
   createdAt: string;
@@ -39,6 +43,7 @@ export type AuthErrorCode =
   | "NICK_TAKEN"
   | "NOT_FOUND"
   | "WRONG_PIN"
+  | "PENDING"
   | "INVALID_INPUT"
   | "NETWORK";
 
@@ -58,6 +63,8 @@ export interface MembersRepository {
   list(): Promise<PublicMember[]>;
   /** Altera o cargo de um membro (usado pela liderança). */
   setGuildRole(id: string, role: GuildRole): Promise<PublicMember>;
+  /** Aprova ou volta para pendente um cadastro. */
+  setStatus(id: string, status: MemberStatus): Promise<PublicMember>;
   /** Remove um membro da guild. */
   remove(id: string): Promise<void>;
   /** Vincula/atualiza a tag do Discord do membro. */
