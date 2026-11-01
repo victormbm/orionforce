@@ -330,6 +330,15 @@ body {
   border-color: var(--of-primary);
   background: var(--of-surface-soft);
 }
+.of-btn-ghost:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.of-btn-ghost:disabled:hover {
+  color: var(--of-text-soft);
+  border-color: var(--of-border);
+  background: var(--of-surface);
+}
 
 .of-tile {
   border-radius: 14px;
@@ -416,6 +425,40 @@ body {
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  color: #fff;
+}
+
+/* ===== GvG — colunas de escalação (drag & drop) ===== */
+.of-gvg-col {
+  border-radius: 16px;
+  border: 1.5px dashed var(--of-border);
+  background: var(--of-surface-soft);
+  padding: 0.85rem;
+  min-height: 160px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.of-gvg-col--over {
+  border-color: var(--of-primary);
+  border-style: solid;
+  background: var(--of-primary-100);
+}
+.of-gvg-card {
+  cursor: grab;
+}
+.of-gvg-card:active {
+  cursor: grabbing;
+}
+.of-gvg-card--dragging {
+  opacity: 0.4;
+}
+.of-mini-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 99px;
+  font-size: 0.62rem;
+  font-weight: 800;
   color: #fff;
 }
 

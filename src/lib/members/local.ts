@@ -63,7 +63,8 @@ export const localMembersRepo: MembersRepository = {
       nickname: nick,
       pinHash: await hashPin(pin),
       classId,
-      guildRole: "recruta", // todo novo cadastro entra como recruta
+      // Bootstrap: o primeiro cadastro da guild vira líder; os demais, recrutas.
+      guildRole: all.length === 0 ? "lider" : "recruta",
       createdAt: new Date().toISOString(),
     };
     writeAll([...all, member]);
@@ -89,5 +90,27 @@ export const localMembersRepo: MembersRepository = {
 
   async list() {
     return readAll().map(toPublic);
+  },
+
+  async setGuildRole(id, role) {
+    const all = readAll();
+    const member = all.find((m) => m.id === id);
+    if (!member) throw new AuthError("NOT_FOUND", "Membro não encontrado.");
+    member.guildRole = role;
+    writeAll(all);
+    return toPublic(member);
+  },
+
+  async remove(id) {
+    writeAll(readAll().filter((m) => m.id !== id));
+  },
+
+  async setDiscord(id, discord) {
+    const all = readAll();
+    const member = all.find((m) => m.id === id);
+    if (!member) throw new AuthError("NOT_FOUND", "Membro não encontrado.");
+    member.discord = discord.trim() || undefined;
+    writeAll(all);
+    return toPublic(member);
   },
 };

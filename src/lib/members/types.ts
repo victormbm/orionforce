@@ -16,6 +16,8 @@ export interface Member {
   pinHash: string;
   classId: string;
   guildRole: GuildRole;
+  /** Tag do Discord (ex: "nick#0001" ou @usuario). Opcional. */
+  discord?: string;
   createdAt: string;
 }
 
@@ -54,4 +56,10 @@ export interface MembersRepository {
   register(input: RegisterInput): Promise<PublicMember>;
   login(input: LoginInput): Promise<PublicMember>;
   list(): Promise<PublicMember[]>;
+  /** Altera o cargo de um membro (usado pela liderança). */
+  setGuildRole(id: string, role: GuildRole): Promise<PublicMember>;
+  /** Remove um membro da guild. */
+  remove(id: string): Promise<void>;
+  /** Vincula/atualiza a tag do Discord do membro. */
+  setDiscord(id: string, discord: string): Promise<PublicMember>;
 }

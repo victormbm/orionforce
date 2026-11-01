@@ -7,18 +7,28 @@ import { ClassIcon } from "@/components/ClassIcon";
 import { getClass } from "@/data/classes";
 import { GUILD_ROLE_INFO } from "@/data/roles";
 import { type PublicMember } from "@/lib/members";
+import { canManage } from "@/lib/permissions";
 import { clearSession } from "@/lib/session";
-
-const NAV = [
-  { href: "/painel", label: "Visão Geral" },
-  { href: "/painel/personagem", label: "Meu Personagem" },
-];
 
 export function PanelTopbar({ me }: { me: PublicMember }) {
   const router = useRouter();
   const pathname = usePathname();
   const myClass = getClass(me.classId);
   const roleInfo = GUILD_ROLE_INFO[me.guildRole];
+
+  const nav = [
+    { href: "/painel", label: "Visão Geral" },
+    { href: "/painel/personagem", label: "Meu Personagem" },
+    { href: "/painel/eventos", label: "Eventos" },
+    { href: "/painel/avisos", label: "Avisos" },
+    { href: "/painel/leilao", label: "Leilão" },
+    ...(canManage(me.guildRole)
+      ? [
+          { href: "/painel/gvg", label: "GvG" },
+          { href: "/painel/lideranca", label: "Liderança" },
+        ]
+      : []),
+  ];
 
   const logout = () => {
     clearSession();
@@ -46,8 +56,8 @@ export function PanelTopbar({ me }: { me: PublicMember }) {
             </span>
           </Link>
 
-          <nav className="flex items-center gap-1">
-            {NAV.map((item) => {
+          <nav className="flex items-center gap-1 overflow-x-auto">
+            {nav.map((item) => {
               const active = pathname === item.href;
               return (
                 <Link

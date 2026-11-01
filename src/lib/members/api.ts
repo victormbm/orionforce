@@ -54,4 +54,20 @@ export const apiMembersRepo: MembersRepository = {
     }),
 
   list: () => request<PublicMember[]>("/api/members"),
+
+  setGuildRole: (id, role) =>
+    request<PublicMember>(`/api/members/${id}/role`, {
+      method: "PATCH",
+      body: JSON.stringify({ role }),
+    }),
+
+  remove: async (id) => {
+    await request<unknown>(`/api/members/${id}`, { method: "DELETE" });
+  },
+
+  setDiscord: (id, discord) =>
+    request<PublicMember>(`/api/members/${id}/discord`, {
+      method: "PATCH",
+      body: JSON.stringify({ discord }),
+    }),
 };
