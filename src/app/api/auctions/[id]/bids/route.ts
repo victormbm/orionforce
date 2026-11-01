@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
+import { authenticate, unauthorized } from "@/lib/auth";
 import { getSql } from "@/lib/db";
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!(await authenticate(req))) return unauthorized();
   const { id } = await params;
   const sql = getSql();
   const rows = await sql`
@@ -18,8 +20,11 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const me = await authenticate(req);
+  if (!me) return unauthorized();
   const { id } = await params;
-  const { memberId, amount } = await req.json();
+  const { amount } = await req.json();
+  const memberId = me.id; // o lance é sempre do próprio membro logado
   const value = Number(amount);
   const sql = getSql();
 

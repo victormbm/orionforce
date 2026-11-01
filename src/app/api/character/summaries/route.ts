@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+import { authenticate, unauthorized } from "@/lib/auth";
 import { getSql } from "@/lib/db";
 
-export async function GET() {
+export async function GET(req: Request) {
+  if (!(await authenticate(req))) return unauthorized();
   const sql = getSql();
   const rows = await sql`
     SELECT member_id AS id,

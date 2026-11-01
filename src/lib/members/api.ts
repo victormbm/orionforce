@@ -1,6 +1,8 @@
+import { getToken } from "@/lib/token";
 import {
   AuthError,
   type AuthErrorCode,
+  type AuthResult,
   type MembersRepository,
   type PublicMember,
 } from "./types";
@@ -16,11 +18,16 @@ async function request<T>(
   path: string,
   init?: RequestInit
 ): Promise<T> {
+  const token = getToken();
   let res: Response;
   try {
     res = await fetch(path, {
-      headers: { "Content-Type": "application/json" },
       ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(init?.headers ?? {}),
+      },
     });
   } catch {
     throw new AuthError("NETWORK", "Falha de conexão. Tente novamente.");
@@ -48,7 +55,7 @@ export const apiMembersRepo: MembersRepository = {
     }),
 
   login: (input) =>
-    request<PublicMember>("/api/members/login", {
+    request<AuthResult>("/api/members/login", {
       method: "POST",
       body: JSON.stringify(input),
     }),

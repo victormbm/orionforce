@@ -180,11 +180,21 @@ DATABASE_URL="...sua string..." node scripts/seed-admins.mjs
 > Troque o PIN padrão assim que possível. Ainda não há tela de "trocar PIN" —
 > dá para rodar o script de novo com `ADMIN_PIN` diferente.
 
-## 🔒 Nota de segurança (para produção)
+## 🔒 Segurança
 
-Hoje o PIN usa hash SHA-256 no cliente — suficiente para a fase local. Ao usar
-o banco em produção, o ideal é:
+Implementado:
 
-- Fazer o hash no **servidor** com **bcrypt/argon2**
-- Adicionar **rate limiting** nas rotas de login
-- Usar sessão por **cookie httpOnly / token** no lugar do localStorage
+- **Aprovação de cadastro**: estranho não acessa até a liderança aprovar
+- **Token de sessão assinado (HMAC-SHA256)**: emitido no login (`AUTH_SECRET`),
+  enviado no header `Authorization` em todas as chamadas de API
+- **Blindagem das rotas** no servidor: toda rota exige login; ações de gestão
+  (aprovar, cargos, eventos, avisos, leilão, GvG) exigem **oficial/líder**;
+  ações pessoais (ficha, presença, lance, Discord) só valem para o próprio membro
+- **Rate limit no login por IP**: 5 tentativas erradas → bloqueio de 15 min
+  (tabela `login_throttle`)
+
+Melhorias futuras (produção):
+
+- Hash do PIN no **servidor** com **bcrypt/argon2** (hoje é SHA-256)
+- Sessão por **cookie httpOnly** em vez de token no localStorage
+- `AUTH_SECRET` forte e único por ambiente (defina no Vercel)

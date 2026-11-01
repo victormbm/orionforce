@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+import { authenticate, forbidden, isManager, unauthorized } from "@/lib/auth";
 import { getSql } from "@/lib/db";
 
-export async function GET() {
+export async function GET(req: Request) {
+  if (!(await authenticate(req))) return unauthorized();
   const sql = getSql();
   const rows = await sql`
     SELECT id, title, type, starts_at AS "startsAt", notes,
@@ -12,6 +14,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const me = await authenticate(req);
+  if (!me) return unauthorized();
+  if (!isManager(me)) return forbidden();
   const { title, type, startsAt, notes, createdBy } = await req.json();
   if (!String(title ?? "").trim() || !startsAt || !type) {
     return NextResponse.json(

@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
+import { authenticate, forbidden, isManager, unauthorized } from "@/lib/auth";
 import { getSql } from "@/lib/db";
 
-export async function GET() {
+export async function GET(req: Request) {
+  const me = await authenticate(req);
+  if (!me) return unauthorized();
+  if (!isManager(me)) return forbidden();
   const sql = getSql();
   const rows = await sql`SELECT member_id, grp FROM gvg_assignments`;
   const out: Record<string, string> = {};
@@ -10,6 +14,9 @@ export async function GET() {
 }
 
 export async function PUT(req: Request) {
+  const me = await authenticate(req);
+  if (!me) return unauthorized();
+  if (!isManager(me)) return forbidden();
   const { memberId, group } = await req.json();
   const sql = getSql();
   if (group === null) {
@@ -25,7 +32,10 @@ export async function PUT(req: Request) {
   return new NextResponse(null, { status: 204 });
 }
 
-export async function DELETE() {
+export async function DELETE(req: Request) {
+  const me = await authenticate(req);
+  if (!me) return unauthorized();
+  if (!isManager(me)) return forbidden();
   const sql = getSql();
   await sql`DELETE FROM gvg_assignments`;
   return new NextResponse(null, { status: 204 });

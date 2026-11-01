@@ -7,6 +7,7 @@ import { ClassIcon } from "@/components/ClassIcon";
 import { CLASSES, getClass } from "@/data/classes";
 import { AuthError, membersRepo } from "@/lib/members";
 import { setSession } from "@/lib/session";
+import { setToken } from "@/lib/token";
 
 type Mode = "login" | "register";
 
@@ -72,7 +73,7 @@ export default function AuthPage() {
   };
 
   const handleLogin = async () => {
-    const member = await membersRepo.login({ nickname, pin });
+    const { member, token } = await membersRepo.login({ nickname, pin });
 
     if (save) {
       localStorage.setItem(
@@ -83,6 +84,7 @@ export default function AuthPage() {
       localStorage.removeItem(CREDENTIALS_KEY);
     }
 
+    setToken(token);
     setSession(member);
     setFeedback({ type: "ok", text: `Bem-vindo, ${member.nickname}!` });
     router.push("/painel");

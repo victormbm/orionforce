@@ -94,7 +94,7 @@ export const localMembersRepo: MembersRepository = {
         "Seu cadastro está aguardando aprovação da liderança."
       );
     }
-    return toPublic(member);
+    return { member: toPublic(member), token: "local" };
   },
 
   async list() {

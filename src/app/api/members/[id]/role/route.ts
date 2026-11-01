@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { authenticate, forbidden, isManager, unauthorized } from "@/lib/auth";
 import { getSql } from "@/lib/db";
 
 const VALID = ["recruta", "membro", "oficial", "lider"];
@@ -7,6 +8,9 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const me = await authenticate(req);
+  if (!me) return unauthorized();
+  if (!isManager(me)) return forbidden();
   const { id } = await params;
   const { role } = await req.json();
   if (!VALID.includes(role)) {

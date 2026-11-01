@@ -57,9 +57,15 @@ export class AuthError extends Error {
   }
 }
 
+/** Resultado do login: o membro + o token de sessão assinado. */
+export interface AuthResult {
+  member: PublicMember;
+  token: string;
+}
+
 export interface MembersRepository {
   register(input: RegisterInput): Promise<PublicMember>;
-  login(input: LoginInput): Promise<PublicMember>;
+  login(input: LoginInput): Promise<AuthResult>;
   list(): Promise<PublicMember[]>;
   /** Altera o cargo de um membro (usado pela liderança). */
   setGuildRole(id: string, role: GuildRole): Promise<PublicMember>;

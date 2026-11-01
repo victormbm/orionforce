@@ -1,4 +1,5 @@
 import type { PublicMember } from "./members";
+import { clearToken } from "./token";
 
 /**
  * Sessão simples no navegador. Guarda o membro logado para o painel interno.
@@ -25,4 +26,5 @@ export function getSession(): PublicMember | null {
 export function clearSession(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem(SESSION_KEY);
+  clearToken();
 }
