@@ -1,8 +1,10 @@
+import { apiAnnouncementsRepo } from "./api";
 import { localAnnouncementsRepo } from "./local";
 import type { AnnouncementsRepository } from "./types";
 
-/** Backend do mural. Hoje local; migra ao Vercel no mesmo padrão. */
+const backend = process.env.NEXT_PUBLIC_DATA_BACKEND ?? "local";
+
 export const announcementsRepo: AnnouncementsRepository =
-  localAnnouncementsRepo;
+  backend === "api" ? apiAnnouncementsRepo : localAnnouncementsRepo;
 
 export * from "./types";
