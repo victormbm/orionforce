@@ -9,11 +9,23 @@ import {
   secondsBlocked,
 } from "@/lib/rate-limit";
 
-export async function POST(req: Request) {
-  const ip = getIp(req);
+const INVALID = {
+  code: "INVALID_CREDENTIALS",
+  message: "Nickname ou PIN inválido.",
+};
 
-  // Bloqueio por força-bruta
-  const blocked = await secondsBlocked(ip);
+export async function POST(req: Request) {
+  const ipKey = getIp(req);
+  const { nickname, pin } = await req.json();
+  const nick = String(nickname ?? "").trim();
+  const acctKey = `acct:${nick.toLowerCase()}`;
+
+  // Bloqueio por força-bruta: por IP e por conta (nickname). O bloqueio por
+  // conta protege mesmo que o atacante troque o IP (x-forwarded-for spoof).
+  const blocked = Math.max(
+    await secondsBlocked(ipKey),
+    nick ? await secondsBlocked(acctKey) : 0
+  );
   if (blocked > 0) {
     const min = Math.ceil(blocked / 60);
     return NextResponse.json(
@@ -25,10 +37,14 @@ export async function POST(req: Request) {
     );
   }
 
-  const sql = getSql();
-  const { nickname, pin } = await req.json();
-  const nick = String(nickname ?? "").trim();
+  // Validação de formato (PIN de 4 dígitos).
+  if (!/^\d{4}$/.test(String(pin ?? "")) || nick.length < 2) {
+    await registerFailure(ipKey);
+    if (nick) await registerFailure(acctKey);
+    return NextResponse.json(INVALID, { status: 401 });
+  }
 
+  const sql = getSql();
   const rows = await sql`
     SELECT id, nickname, pin_hash, class_id AS "classId",
            guild_role AS "guildRole", status, discord, created_at AS "createdAt"
@@ -37,13 +53,11 @@ export async function POST(req: Request) {
   `;
   const member = rows[0];
 
+  // Resposta idêntica para "não existe" e "PIN errado" (anti-enumeração).
   if (!member || member.pin_hash !== (await hashPin(String(pin)))) {
-    await registerFailure(ip);
-    const code = !member ? "NOT_FOUND" : "WRONG_PIN";
-    const message = !member
-      ? "Nickname não encontrado. Faça seu cadastro primeiro."
-      : "PIN incorreto. Tente novamente.";
-    return NextResponse.json({ code, message }, { status: member ? 401 : 404 });
+    await registerFailure(ipKey);
+    await registerFailure(acctKey);
+    return NextResponse.json(INVALID, { status: 401 });
   }
 
   if (member.status === "pendente") {
@@ -56,7 +70,8 @@ export async function POST(req: Request) {
     );
   }
 
-  await clearFailures(ip);
+  await clearFailures(ipKey);
+  await clearFailures(acctKey);
   delete member.pin_hash;
   const token = await signToken(member.id);
   return NextResponse.json({ member, token });

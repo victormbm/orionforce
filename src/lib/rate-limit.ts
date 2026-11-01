@@ -6,9 +6,14 @@ const LOCK_MS = 15 * 60 * 1000; // bloqueio de 15 min
 const WINDOW_MS = 15 * 60 * 1000; // janela para zerar o contador
 
 export function getIp(req: Request): string {
+  // x-real-ip é definido pela plataforma (Vercel) e não é spoofável pelo
+  // cliente; preferimos ele. x-forwarded-for é controlável pelo cliente,
+  // por isso NÃO confiamos só nele — o bloqueio por conta cobre esse caso.
+  const real = req.headers.get("x-real-ip");
+  if (real) return real.trim();
   const fwd = req.headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0].trim();
-  return req.headers.get("x-real-ip") ?? "unknown";
+  return "unknown";
 }
 
 /** Retorna segundos restantes de bloqueio, ou 0 se liberado. */

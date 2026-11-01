@@ -1,15 +1,28 @@
 import { NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
 import { hashPin } from "@/lib/members/hash";
+import { CLASSES } from "@/data/classes";
 
 export async function POST(req: Request) {
   const sql = getSql();
   const { nickname, pin, classId } = await req.json();
   const nick = String(nickname ?? "").trim();
 
-  if (!nick || String(pin ?? "").length !== 4 || !classId) {
+  if (nick.length < 2 || nick.length > 24) {
     return NextResponse.json(
-      { code: "INVALID_INPUT", message: "Preencha nickname, classe e PIN." },
+      { code: "INVALID_INPUT", message: "Nickname deve ter de 2 a 24 caracteres." },
+      { status: 400 }
+    );
+  }
+  if (!/^\d{4}$/.test(String(pin ?? ""))) {
+    return NextResponse.json(
+      { code: "INVALID_INPUT", message: "O PIN deve ter 4 dígitos." },
+      { status: 400 }
+    );
+  }
+  if (!CLASSES.some((c) => c.id === classId)) {
+    return NextResponse.json(
+      { code: "INVALID_INPUT", message: "Classe inválida." },
       { status: 400 }
     );
   }
