@@ -1,12 +1,10 @@
+import { apiCharacterRepo } from "./api";
 import { localCharacterRepo } from "./local";
 import type { CharacterRepository } from "./types";
 
-/**
- * Backend da ficha de personagem. Hoje: local (localStorage).
- * Para migrar ao Vercel, criar uma implementação `api.ts` (fetch →
- * /api/character/*) e tabelas `character_sheets` e `snapshots`, depois
- * trocar aqui. A tela não muda. (Mesmo padrão de src/lib/members.)
- */
-export const characterRepo: CharacterRepository = localCharacterRepo;
+const backend = process.env.NEXT_PUBLIC_DATA_BACKEND ?? "local";
+
+export const characterRepo: CharacterRepository =
+  backend === "api" ? apiCharacterRepo : localCharacterRepo;
 
 export * from "./types";
