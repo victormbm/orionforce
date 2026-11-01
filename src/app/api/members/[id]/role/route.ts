@@ -1,0 +1,31 @@
+import { NextResponse } from "next/server";
+import { getSql } from "@/lib/db";
+
+const VALID = ["recruta", "membro", "oficial", "lider"];
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const { role } = await req.json();
+  if (!VALID.includes(role)) {
+    return NextResponse.json(
+      { code: "INVALID_INPUT", message: "Cargo inválido." },
+      { status: 400 }
+    );
+  }
+  const sql = getSql();
+  const rows = await sql`
+    UPDATE members SET guild_role = ${role} WHERE id = ${id}
+    RETURNING id, nickname, class_id AS "classId", guild_role AS "guildRole",
+              discord, created_at AS "createdAt"
+  `;
+  if (!rows.length) {
+    return NextResponse.json(
+      { code: "NOT_FOUND", message: "Membro não encontrado." },
+      { status: 404 }
+    );
+  }
+  return NextResponse.json(rows[0]);
+}
