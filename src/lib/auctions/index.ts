@@ -1,7 +1,10 @@
+import { apiAuctionsRepo } from "./api";
 import { localAuctionsRepo } from "./local";
 import type { AuctionsRepository } from "./types";
 
-/** Backend do leilão. Hoje local; migra ao Vercel no mesmo padrão. */
-export const auctionsRepo: AuctionsRepository = localAuctionsRepo;
+const backend = process.env.NEXT_PUBLIC_DATA_BACKEND ?? "local";
+
+export const auctionsRepo: AuctionsRepository =
+  backend === "api" ? apiAuctionsRepo : localAuctionsRepo;
 
 export * from "./types";

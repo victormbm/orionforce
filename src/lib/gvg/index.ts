@@ -1,7 +1,10 @@
+import { apiGvgRepo } from "./api";
 import { localGvgRepo } from "./local";
 import type { GvgRepository } from "./types";
 
-/** Backend da escalação de GvG. Hoje local; migra ao Vercel no mesmo padrão. */
-export const gvgRepo: GvgRepository = localGvgRepo;
+const backend = process.env.NEXT_PUBLIC_DATA_BACKEND ?? "local";
+
+export const gvgRepo: GvgRepository =
+  backend === "api" ? apiGvgRepo : localGvgRepo;
 
 export * from "./types";
