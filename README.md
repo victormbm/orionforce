@@ -140,17 +140,26 @@ interface**.
 
 ## 🧭 Roadmap (features inspiradas em painéis similares)
 
-Já implementado: ficha de atributos (General/Quasi/Special), diff "Salvo vs Em
-edição", campos obrigatórios por classe, "Mostrar todos", snapshots e
-comparativo de evolução, integração do Poder com o roster/dashboard.
+Já implementado:
+
+- Login/cadastro com PIN, sessão e **bootstrap** (1º cadastro vira líder)
+- Dashboard, composição e **roster** (ordenado por Poder)
+- **Meu Personagem**: atributos (General/Quasi/Special), diff "Salvo vs Em
+  edição", obrigatórios por classe, "Mostrar todos", snapshots e comparativo
+- **Eventos (WoE/GvG/MVP)**: agenda + confirmação de presença (Vou/Talvez/Não)
+- **Área da Liderança**: aprovar recrutas, gerenciar cargos, remover membros
+- **Mensagens da Liderança**: mural de avisos (publicar/excluir por gestores)
+- **Leilão interno**: lotes, lances em zeny, maior lance, encerrar/excluir
+- **Discord (manual)**: vínculo da tag no "Meu Personagem" + exibição no roster
+- **Escalação de GvG**: arrastar-e-soltar (Disponíveis/Elite/Secundária) com
+  poder total e composição por função de cada grupo (admin)
+- Controle de acesso por cargo (oficial/líder) nas rotas de gestão
 
 Próximas fases (dependem de backend/serviços — ficam para depois do Vercel):
 
-- **Discord OAuth** — vincular conta e liberar cargos via bot
-- **Eventos (WoE/GvG/MVP)** — agenda + confirmação de presença + aviso no Discord
-- **Leilão interno** — distribuição de itens da guild
-- **Mensagens da liderança** — mural/avisos
-- **Prazo de atualização semanal** — cobrança automática de atualização de atributos
+- **Discord OAuth** — vínculo automático da conta e liberação de cargos via bot
+- **Aviso de evento no Discord** — webhook antes do WoE/GvG
+- **Prazo de atualização semanal** — cobrança automática de atributos
 - **Calculadoras** — RAW DEF e simulador de dano PvP
 - **Perfis por classe** — múltiplas builds por membro (ex: PvP x PvE)
 
