@@ -88,3 +88,11 @@ CREATE TABLE IF NOT EXISTS gvg_assignments (
   member_id   UUID PRIMARY KEY REFERENCES members(id) ON DELETE CASCADE,
   grp         TEXT NOT NULL CHECK (grp IN ('elite', 'secundaria'))
 );
+
+-- ---------- Controle de tentativas de login (anti força-bruta) ----------
+CREATE TABLE IF NOT EXISTS login_throttle (
+  ip            TEXT PRIMARY KEY,
+  fails         INT NOT NULL DEFAULT 0,
+  blocked_until TIMESTAMPTZ,
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
