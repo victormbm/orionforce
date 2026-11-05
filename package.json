@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:i18n": "node --test scripts/i18n.test.cjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
