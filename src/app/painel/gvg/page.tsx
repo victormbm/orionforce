@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ClassIcon } from "@/components/ClassIcon";
@@ -10,7 +12,6 @@ import { gvgRepo, type GvgGroup } from "@/lib/gvg";
 import { membersRepo, type PublicMember } from "@/lib/members";
 import { canLead } from "@/lib/permissions";
 import { getSession } from "@/lib/session";
-import { formatValue } from "@/lib/format";
 
 /** Referência: party de RO = até 12 jogadores. */
 const PARTY_SIZE = 12;
@@ -26,6 +27,7 @@ const COLUMNS: { id: ColId; title: string; color: string; group: GvgGroup | null
 const ROLE_ORDER: Role[] = ["DPS", "MDPS", "SUP", "TANK"];
 
 export default function GvgPage() {
+  const { t, formatNumber: formatValue } = useLanguage();
   const router = useRouter();
   const [me, setMe] = useState<PublicMember | null>(null);
   const [members, setMembers] = useState<PublicMember[]>([]);
@@ -89,7 +91,7 @@ export default function GvgPage() {
   };
 
   const handleClear = async () => {
-    if (!confirm("Limpar toda a escalação de GvG?")) return;
+    if (!confirm(t("Limpar toda a escalação de GvG?"))) return;
     await gvgRepo.clear();
     setAssignments({});
   };
@@ -108,23 +110,14 @@ export default function GvgPage() {
             <h1
               className="text-xl font-extrabold tracking-tight sm:text-2xl"
               style={{ color: "var(--of-text)" }}
-            >
-              Escalação de GvG
-            </h1>
-            <p className="mt-1 text-sm" style={{ color: "var(--of-text-soft)" }}>
-              Arraste os membros entre os grupos (ou use os botões no celular).
-              Referência: party de RO = até {PARTY_SIZE} por grupo.
-            </p>
+            >{t("Escalação de GvG")} </h1>
+            <p className="mt-1 text-sm" style={{ color: "var(--of-text-soft)" }}>{t("Arraste os membros entre os grupos (ou use os botões no celular). Referência: party de RO = até")} {PARTY_SIZE} {t("por grupo.")} </p>
           </div>
-          <button className="of-btn-ghost" onClick={handleClear}>
-            Limpar escalação
-          </button>
+          <button className="of-btn-ghost" onClick={handleClear}>{t("Limpar escalação")} </button>
         </div>
 
         {loading ? (
-          <p className="mt-6 text-sm" style={{ color: "var(--of-text-muted)" }}>
-            Carregando...
-          </p>
+          <p className="mt-6 text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Carregando...")} </p>
         ) : (
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             {COLUMNS.map((col) => {
@@ -158,7 +151,7 @@ export default function GvgPage() {
                         className="text-sm font-black uppercase tracking-wide"
                         style={{ color: "var(--of-text)" }}
                       >
-                        {col.title}
+                        {t(col.title)}
                       </h2>
                     </div>
                     <span
@@ -198,8 +191,8 @@ export default function GvgPage() {
                         style={{ color: "var(--of-text-muted)" }}
                       >
                         {col.group === null
-                          ? "Todos escalados."
-                          : "Arraste membros para cá."}
+                          ? t("Todos escalados.")
+                          : t("Arraste membros para cá.")}
                       </p>
                     )}
                     {list.map((m) => {
@@ -240,19 +233,19 @@ export default function GvgPage() {
                               <GroupBtn
                                 active={col.group === "elite"}
                                 color="#e0a73a"
-                                label="Elite"
+                                label={t("Elite")}
                                 onClick={() => assign(m.id, "elite")}
                               />
                               <GroupBtn
                                 active={col.group === "secundaria"}
                                 color="#2f6bff"
-                                label="Sec."
+                                label={t("Sec.")}
                                 onClick={() => assign(m.id, "secundaria")}
                               />
                               <GroupBtn
                                 active={col.group === null}
                                 color="#8fa0bd"
-                                label="Tirar"
+                                label={t("Tirar")}
                                 onClick={() => assign(m.id, null)}
                               />
                             </div>
@@ -268,12 +261,8 @@ export default function GvgPage() {
         )}
 
         {!loading && (
-          <p className="mt-6 text-xs" style={{ color: "var(--of-text-muted)" }}>
-            Poder total escalado (Elite + Secundária):{" "}
-            <b style={{ color: "var(--of-gold)" }}>{formatValue(totalPoder)}</b>.
-            Dica: equilibre frente (Knight/Paladin), dano (Wizard/Sniper/Assassin)
-            e suporte (Priest) em cada grupo.
-          </p>
+          <p className="mt-6 text-xs" style={{ color: "var(--of-text-muted)" }}>{t("Poder total escalado (Elite + Secundária):")}{" "}
+            <b style={{ color: "var(--of-gold)" }}>{formatValue(totalPoder)}</b>{t(". Dica: equilibre frente (Knight/Paladin), dano (Wizard/Sniper/Assassin) e suporte (Priest) em cada grupo.")} </p>
         )}
       </main>
     </div>

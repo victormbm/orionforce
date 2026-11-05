@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { PanelTopbar } from "@/components/PanelTopbar";
@@ -27,6 +29,7 @@ const ATT_OPTIONS: { value: Attendance; label: string; color: string }[] = [
 ];
 
 export default function EventsPage() {
+  const { t, locale } = useLanguage();
   const router = useRouter();
   const [me, setMe] = useState<PublicMember | null>(null);
   const [members, setMembers] = useState<PublicMember[]>([]);
@@ -116,40 +119,34 @@ export default function EventsPage() {
         <h1
           className="text-xl font-extrabold tracking-tight sm:text-2xl"
           style={{ color: "var(--of-text)" }}
-        >
-          Eventos da Guild
-        </h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--of-text-soft)" }}>
-          WoE, GvG, MVPs e mais. Confirme sua presença.
-        </p>
+        >{t("Eventos da Guild")} </h1>
+        <p className="mt-1 text-sm" style={{ color: "var(--of-text-soft)" }}>{t("WoE, GvG, MVPs e mais. Confirme sua presença.")} </p>
 
         {/* Criação (apenas oficiais/líderes) */}
         {manager && (
           <form onSubmit={handleCreate} className="of-section mt-6 p-5">
-            <h2 className="of-label mb-4" style={{ color: "var(--of-primary)" }}>
-              Criar evento
-            </h2>
+            <h2 className="of-label mb-4" style={{ color: "var(--of-primary)" }}>{t("Criar evento")} </h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <label className="of-label mb-2 block">Título</label>
+                <label className="of-label mb-2 block">{t("Título")}</label>
                 <input
                   className="of-input"
-                  placeholder="Ex: WoE de Terça"
+                  placeholder={t("Ex: WoE de Terça")}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
               </div>
               <div>
-                <label className="of-label mb-2 block">Tipo</label>
+                <label className="of-label mb-2 block">{t("Tipo")}</label>
                 <div className="relative">
                   <select
                     className="of-input of-select cursor-pointer pr-9"
                     value={type}
                     onChange={(e) => setType(e.target.value as EventType)}
                   >
-                    {EVENT_TYPES.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
+                    {EVENT_TYPES.map((eventType) => (
+                      <option key={eventType} value={eventType}>
+                        {t(eventType)}
                       </option>
                     ))}
                   </select>
@@ -159,7 +156,7 @@ export default function EventsPage() {
                 </div>
               </div>
               <div>
-                <label className="of-label mb-2 block">Data e hora</label>
+                <label className="of-label mb-2 block">{t("Data e hora")}</label>
                 <input
                   type="datetime-local"
                   className="of-input"
@@ -168,10 +165,10 @@ export default function EventsPage() {
                 />
               </div>
               <div>
-                <label className="of-label mb-2 block">Observações</label>
+                <label className="of-label mb-2 block">{t("Observações")}</label>
                 <input
                   className="of-input"
-                  placeholder="Ponto de encontro, requisitos..."
+                  placeholder={t("Ponto de encontro, requisitos...")}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                 />
@@ -182,23 +179,17 @@ export default function EventsPage() {
               className="of-cta mt-4"
               style={{ width: "auto" }}
               disabled={!title.trim() || !startsAt}
-            >
-              Criar evento
-            </button>
+            >{t("Criar evento")} </button>
           </form>
         )}
 
         {/* Lista de eventos */}
         <section className="mt-6 flex flex-col gap-4">
           {loading ? (
-            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
-              Carregando...
-            </p>
+            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Carregando...")} </p>
           ) : events.length === 0 ? (
             <div className="of-section p-6 text-center">
-              <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
-                Nenhum evento agendado.
-                {manager ? " Crie o primeiro acima! 👆" : ""}
+              <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Nenhum evento agendado.")} {manager ? " " + t("Crie o primeiro acima! 👆") : ""}
               </p>
             </div>
           ) : (
@@ -222,15 +213,13 @@ export default function EventsPage() {
                           className="of-role-pill"
                           style={{ background: TYPE_COLOR[ev.type] }}
                         >
-                          {ev.type}
+                          {t(ev.type)}
                         </span>
                         {past && (
                           <span
                             className="text-[11px] font-bold uppercase"
                             style={{ color: "var(--of-text-muted)" }}
-                          >
-                            Encerrado
-                          </span>
+                          >{t("Encerrado")} </span>
                         )}
                       </div>
                       <h3
@@ -244,7 +233,7 @@ export default function EventsPage() {
                         style={{ color: "var(--of-text-soft)" }}
                       >
                         🕒{" "}
-                        {new Date(ev.startsAt).toLocaleString("pt-BR", {
+                        {new Date(ev.startsAt).toLocaleString(locale, {
                           dateStyle: "full",
                           timeStyle: "short",
                         })}
@@ -262,9 +251,7 @@ export default function EventsPage() {
                       <button
                         className="of-btn-ghost"
                         onClick={() => handleDelete(ev.id)}
-                      >
-                        Excluir
-                      </button>
+                      >{t("Excluir")} </button>
                     )}
                   </div>
 
@@ -273,9 +260,7 @@ export default function EventsPage() {
                     <span
                       className="text-xs font-bold"
                       style={{ color: "var(--of-text-soft)" }}
-                    >
-                      Sua presença:
-                    </span>
+                    >{t("Sua presença:")} </span>
                     {ATT_OPTIONS.map((opt) => {
                       const active = myStatus === opt.value;
                       return (
@@ -293,7 +278,7 @@ export default function EventsPage() {
                           }
                           onClick={() => setMyAttendance(ev.id, opt.value)}
                         >
-                          {opt.label}
+                          {t(opt.label)}
                         </button>
                       );
                     })}
@@ -305,21 +290,17 @@ export default function EventsPage() {
                     style={{ color: "var(--of-text-soft)" }}
                   >
                     <span>
-                      ✅ <b>{counts.vou}</b> vão
-                    </span>
+                      ✅ <b>{counts.vou}</b> {t("vão")} </span>
                     <span>
-                      ❓ <b>{counts.talvez}</b> talvez
-                    </span>
+                      ❓ <b>{counts.talvez}</b> {t("talvez")} </span>
                     <span>
-                      ❌ <b>{counts.nao}</b> não vão
-                    </span>
+                      ❌ <b>{counts.nao}</b> {t("não vão")} </span>
                   </div>
                   {goers.length > 0 && (
                     <p
                       className="mt-2 text-xs"
                       style={{ color: "var(--of-text-muted)" }}
-                    >
-                      Confirmados: {goers.join(", ")}
+                    >{t("Confirmados:")} {goers.join(", ")}
                     </p>
                   )}
                 </div>

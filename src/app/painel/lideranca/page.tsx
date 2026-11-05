@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ClassIcon } from "@/components/ClassIcon";
@@ -19,6 +21,7 @@ const ROLE_ORDER: GuildRole[] = [
 ];
 
 export default function LeadershipPage() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [me, setMe] = useState<PublicMember | null>(null);
   const [members, setMembers] = useState<PublicMember[]>([]);
@@ -53,20 +56,20 @@ export default function LeadershipPage() {
   };
 
   const remove = async (id: string, nickname: string) => {
-    if (!confirm(`Remover ${nickname} da guild?`)) return;
+    if (!confirm(t("Remover {nickname} da guild?", { nickname }))) return;
     await membersRepo.remove(id);
     await reload();
   };
 
   const resetPin = async (id: string, nickname: string) => {
-    if (!confirm(`Resetar o PIN de ${nickname}?`)) return;
+    if (!confirm(t("Resetar o PIN de {nickname}?", { nickname }))) return;
     try {
       const pin = await membersRepo.resetPin(id);
       alert(
-        `PIN de ${nickname} resetado para: ${pin}\n\nPasse esse PIN temporário para a pessoa. Ela pode trocar depois em "Meu Personagem".`
+        t('PIN de {nickname} resetado para: {pin}\n\nPasse esse PIN temporário para a pessoa. Ela pode trocar depois em "Meu Personagem".', { nickname, pin })
       );
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Erro ao resetar o PIN.");
+      alert(e instanceof Error ? e.message : t("Erro ao resetar o PIN."));
     }
   };
 
@@ -82,26 +85,17 @@ export default function LeadershipPage() {
         <h1
           className="text-xl font-extrabold tracking-tight sm:text-2xl"
           style={{ color: "var(--of-text)" }}
-        >
-          Área da Liderança
-        </h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--of-text-soft)" }}>
-          Aprove cadastros, gerencie cargos e o quadro de membros.
-        </p>
+        >{t("Área da Liderança")} </h1>
+        <p className="mt-1 text-sm" style={{ color: "var(--of-text-soft)" }}>{t("Aprove cadastros, gerencie cargos e o quadro de membros.")} </p>
 
         {/* Cadastros pendentes de aprovação */}
         <section className="of-section mt-6 p-5">
-          <h2 className="of-label mb-4" style={{ color: "var(--of-gold)" }}>
-            Cadastros pendentes ({pendings.length})
+          <h2 className="of-label mb-4" style={{ color: "var(--of-gold)" }}>{t("Cadastros pendentes (")}{pendings.length})
           </h2>
           {loading ? (
-            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
-              Carregando...
-            </p>
+            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Carregando...")} </p>
           ) : pendings.length === 0 ? (
-            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
-              Nenhum cadastro aguardando aprovação. 🎉
-            </p>
+            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Nenhum cadastro aguardando aprovação. 🎉")} </p>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {pendings.map((m) => {
@@ -130,17 +124,13 @@ export default function LeadershipPage() {
                             color: "#30a46c",
                           }}
                           onClick={() => approve(m.id)}
-                        >
-                          Aprovar
-                        </button>
+                        >{t("Aprovar")} </button>
                         {iCanLead && (
                           <button
                             className="of-btn-ghost"
                             style={{ borderColor: "#e5484d", color: "#e5484d" }}
                             onClick={() => remove(m.id, m.nickname)}
-                          >
-                            Recusar
-                          </button>
+                          >{t("Recusar")} </button>
                         )}
                       </div>
                     </div>
@@ -153,8 +143,7 @@ export default function LeadershipPage() {
 
         {/* Quadro de membros aprovados */}
         <section className="of-section mt-6 p-5">
-          <h2 className="of-label mb-4" style={{ color: "var(--of-primary)" }}>
-            Quadro de membros ({approved.length})
+          <h2 className="of-label mb-4" style={{ color: "var(--of-primary)" }}>{t("Quadro de membros (")}{approved.length})
           </h2>
           <div className="flex flex-col gap-3">
             {approved.map((m) => {
@@ -177,9 +166,7 @@ export default function LeadershipPage() {
                         <span
                           className="ml-2 text-[11px] font-normal"
                           style={{ color: "var(--of-text-muted)" }}
-                        >
-                          (você)
-                        </span>
+                        >{t("(você)")} </span>
                       )}
                     </p>
                     <p
@@ -202,7 +189,7 @@ export default function LeadershipPage() {
                     >
                       {ROLE_ORDER.map((r) => (
                         <option key={r} value={r}>
-                          {GUILD_ROLE_INFO[r].label}
+                          {t(GUILD_ROLE_INFO[r].label)}
                         </option>
                       ))}
                     </select>
@@ -215,9 +202,7 @@ export default function LeadershipPage() {
                     <button
                       className="of-btn-ghost shrink-0"
                       onClick={() => resetPin(m.id, m.nickname)}
-                    >
-                      Resetar PIN
-                    </button>
+                    >{t("Resetar PIN")} </button>
                   )}
                   {iCanLead && (
                     <button
@@ -225,9 +210,7 @@ export default function LeadershipPage() {
                       style={{ borderColor: "#e5484d", color: "#e5484d" }}
                       disabled={isSelf}
                       onClick={() => remove(m.id, m.nickname)}
-                    >
-                      Remover
-                    </button>
+                    >{t("Remover")} </button>
                   )}
                 </div>
               );

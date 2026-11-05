@@ -539,3 +539,39 @@ body {
 .of-attr-foot .dirty {
   color: var(--of-gold);
 }
+.of-language-bar {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px max(16px, calc((100% - 1200px) / 2));
+  background: var(--of-surface);
+  border-bottom: 1px solid var(--of-border);
+}
+.of-language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.of-language-switcher > span { margin-right: 4px; font-size: 14px; }
+.of-language-switcher button {
+  cursor: pointer;
+  border: 1px solid var(--of-border);
+  border-radius: 7px;
+  padding: 5px 10px;
+  background: var(--of-surface);
+  color: var(--of-text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  transition: background 150ms, color 150ms;
+}
+.of-language-switcher button:hover { background: var(--of-primary-100); }
+.of-language-switcher button[aria-pressed="true"] {
+  background: var(--of-primary);
+  border-color: var(--of-primary);
+  color: white;
+}
+.of-language-switcher button:focus-visible {
+  outline: 2px solid var(--of-primary);
+  outline-offset: 2px;
+}

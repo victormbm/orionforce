@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ClassIcon } from "@/components/ClassIcon";
@@ -12,11 +14,11 @@ import {
   type AttrField,
 } from "@/data/attributes";
 import { characterRepo, type Snapshot } from "@/lib/character";
-import { formatValue, parseNumber } from "@/lib/format";
+import { parseNumber } from "@/lib/format";
 import { membersRepo, type PublicMember } from "@/lib/members";
 import { getSession, setSession } from "@/lib/session";
 
-type Feedback = { type: "ok" | "error"; text: string } | null;
+type Feedback = { type: "ok" | "error"; text: string; fields?: string[] } | null;
 
 function toEditMap(attrs: Record<string, number>): Record<string, string> {
   const out: Record<string, string> = {};
@@ -25,6 +27,7 @@ function toEditMap(attrs: Record<string, number>): Record<string, string> {
 }
 
 export default function CharacterPage() {
+  const { t, locale, formatNumber: formatValue } = useLanguage();
   const router = useRouter();
   const [me, setMe] = useState<PublicMember | null>(null);
   const [saved, setSaved] = useState<Record<string, number>>({});
@@ -84,9 +87,8 @@ export default function CharacterPage() {
     if (missing.length) {
       setFeedback({
         type: "error",
-        text: `Preencha os campos obrigatórios: ${missing
-          .map((f) => f.label)
-          .join(", ")}.`,
+        text: "Preencha os campos obrigatórios: {fields}.",
+        fields: missing.map((f) => f.label),
       });
       return false;
     }
@@ -211,9 +213,7 @@ export default function CharacterPage() {
           </div>
           <div className="flex gap-6">
             <div>
-              <p className="of-tile-label" style={{ marginTop: 0 }}>
-                ⚡ Poder atual
-              </p>
+              <p className="of-tile-label" style={{ marginTop: 0 }}>{t("⚡ Poder atual")} </p>
               <p
                 className="text-2xl font-black"
                 style={{ color: "var(--of-gold)" }}
@@ -222,9 +222,7 @@ export default function CharacterPage() {
               </p>
             </div>
             <div>
-              <p className="of-tile-label" style={{ marginTop: 0 }}>
-                ❤ HP máximo
-              </p>
+              <p className="of-tile-label" style={{ marginTop: 0 }}>{t("❤ HP máximo")} </p>
               <p
                 className="text-2xl font-black"
                 style={{ color: "var(--of-text)" }}
@@ -239,16 +237,11 @@ export default function CharacterPage() {
         <section className="of-section mt-4 p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="of-label" style={{ color: "var(--of-primary)" }}>
-                Minha conta Discord
-              </h2>
+              <h2 className="of-label" style={{ color: "var(--of-primary)" }}>{t("Minha conta Discord")} </h2>
               <p
                 className="mt-1 text-xs"
                 style={{ color: "var(--of-text-muted)" }}
-              >
-                Informe sua tag para a liderança te reconhecer. (A vinculação
-                automática via OAuth entra numa fase futura.)
-              </p>
+              >{t("Informe sua tag para a liderança te reconhecer. (A vinculação automática via OAuth entra numa fase futura.)")} </p>
             </div>
             <span
               className="of-role-pill"
@@ -256,14 +249,14 @@ export default function CharacterPage() {
                 background: me.discord ? "#30a46c" : "#8fa0bd",
               }}
             >
-              {me.discord ? "Vinculada" : "Não vinculada"}
+              {me.discord ? t("Vinculada") : t("Não vinculada")}
             </span>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <input
               className="of-input"
               style={{ maxWidth: 280 }}
-              placeholder="Ex: seunick ou seunick#0001"
+              placeholder={t("Ex: seunick ou seunick#0001")}
               value={discord}
               onChange={(e) => setDiscord(e.target.value)}
             />
@@ -272,17 +265,13 @@ export default function CharacterPage() {
               style={{ width: "auto", marginTop: 0 }}
               onClick={handleSaveDiscord}
               disabled={(discord.trim() || "") === (me.discord ?? "")}
-            >
-              Salvar Discord
-            </button>
+            >{t("Salvar Discord")} </button>
           </div>
         </section>
 
         {/* Editar classe */}
         <section className="of-section mt-4 p-5">
-          <h2 className="of-label" style={{ color: "var(--of-primary)" }}>
-            Classe do personagem
-          </h2>
+          <h2 className="of-label" style={{ color: "var(--of-primary)" }}>{t("Classe do personagem")} </h2>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <ClassIcon gameClass={getClass(classSel) ?? CLASSES[0]} size={44} />
             <div className="relative" style={{ minWidth: 220 }}>
@@ -306,24 +295,20 @@ export default function CharacterPage() {
               style={{ width: "auto", marginTop: 0 }}
               onClick={handleSaveClass}
               disabled={classSel === me.classId}
-            >
-              Salvar classe
-            </button>
+            >{t("Salvar classe")} </button>
           </div>
         </section>
 
         {/* Trocar PIN */}
         <section className="of-section mt-4 p-5">
-          <h2 className="of-label" style={{ color: "var(--of-primary)" }}>
-            Trocar PIN
-          </h2>
+          <h2 className="of-label" style={{ color: "var(--of-primary)" }}>{t("Trocar PIN")} </h2>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <input
               className="of-input"
               style={{ maxWidth: 150 }}
               inputMode="numeric"
               maxLength={4}
-              placeholder="PIN atual"
+              placeholder={t("PIN atual")}
               value={pinCur}
               onChange={(e) => setPinCur(e.target.value.replace(/\D/g, ""))}
             />
@@ -332,7 +317,7 @@ export default function CharacterPage() {
               style={{ maxWidth: 150 }}
               inputMode="numeric"
               maxLength={4}
-              placeholder="Novo PIN"
+              placeholder={t("Novo PIN")}
               value={pinNew}
               onChange={(e) => setPinNew(e.target.value.replace(/\D/g, ""))}
             />
@@ -341,9 +326,7 @@ export default function CharacterPage() {
               style={{ width: "auto", marginTop: 0 }}
               onClick={handleChangePin}
               disabled={pinCur.length !== 4 || pinNew.length !== 4}
-            >
-              Salvar PIN
-            </button>
+            >{t("Salvar PIN")} </button>
           </div>
         </section>
 
@@ -356,24 +339,20 @@ export default function CharacterPage() {
             onClick={handleSave}
             disabled={busy || !anyDirty}
           >
-            {busy ? "Salvando…" : "Salvar atributos"}
+            {busy ? t("Salvando…") : t("Salvar atributos")}
           </button>
           <button
             type="button"
             className="of-btn-ghost"
             onClick={handleReset}
             disabled={busy || !anyDirty}
-          >
-            Desfazer edição
-          </button>
+          >{t("Desfazer edição")} </button>
           <button
             type="button"
             className="of-btn-ghost"
             onClick={handleSnapshot}
             disabled={busy}
-          >
-            📸 Salvar snapshot
-          </button>
+          >{t("📸 Salvar snapshot")} </button>
 
           <label className="ml-auto flex cursor-pointer items-center gap-2 text-sm">
             <input
@@ -382,9 +361,7 @@ export default function CharacterPage() {
               onChange={(e) => setShowAll(e.target.checked)}
               className="h-4 w-4 accent-[var(--of-primary)]"
             />
-            <span style={{ color: "var(--of-text-soft)" }}>
-              Mostrar todos os atributos
-              {hiddenCount > 0 && !showAll ? ` (+${hiddenCount} ocultos)` : ""}
+            <span style={{ color: "var(--of-text-soft)" }}>{t("Mostrar todos os atributos")} {hiddenCount > 0 && !showAll ? t(" (+{count} ocultos)", { count: hiddenCount }) : ""}
             </span>
           </label>
         </div>
@@ -397,15 +374,11 @@ export default function CharacterPage() {
               color: feedback.type === "error" ? "#b42318" : "#1a7f4b",
             }}
           >
-            {feedback.text}
+            {t(feedback.text, feedback.fields ? { fields: feedback.fields.map((label) => t(label)).join(", ") } : undefined)}
           </p>
         )}
 
-        <p className="mt-3 text-xs" style={{ color: "var(--of-text-muted)" }}>
-          Regra: cidade, equipamentos/cartas PvP e nenhum buff. Digite números
-          sem separadores de milhar. <span style={{ color: "var(--of-gold)" }}>*</span>{" "}
-          indica campos obrigatórios para a classe.
-        </p>
+        <p className="mt-3 text-xs" style={{ color: "var(--of-text-muted)" }}>{t("Regra: cidade, equipamentos/cartas PvP e nenhum buff. Digite números sem separadores de milhar.")} <span style={{ color: "var(--of-gold)" }}>*</span>{" "}{t("indica campos obrigatórios para a classe.")} </p>
 
         {/* Seções de atributos */}
         {ATTR_SECTIONS.map((section) => {
@@ -419,13 +392,13 @@ export default function CharacterPage() {
                 className="text-sm font-black uppercase tracking-wide"
                 style={{ color: "var(--of-gold)" }}
               >
-                {section.title}
+                {t(section.title)}
               </h2>
               <p
                 className="mb-4 text-xs"
                 style={{ color: "var(--of-text-muted)" }}
               >
-                {section.subtitle}
+                {t(section.subtitle)}
               </p>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {fields.map((f) => {
@@ -438,7 +411,7 @@ export default function CharacterPage() {
                       className={`of-attr ${dirty ? "of-attr--dirty" : ""}`}
                     >
                       <div className="of-attr-label">
-                        {f.label}
+                        {t(f.label)}
                         {req && (
                           <span style={{ color: "var(--of-gold)" }}> *</span>
                         )}
@@ -462,16 +435,14 @@ export default function CharacterPage() {
                         )}
                       </div>
                       <div className="of-attr-foot">
-                        <span>
-                          Salvo:{" "}
+                        <span>{t("Salvo:")}{" "}
                           <b>
                             {saved[f.id] !== undefined
                               ? formatValue(saved[f.id], f.suffix)
                               : "—"}
                           </b>
                         </span>
-                        <span className={dirty ? "dirty" : ""}>
-                          Em edição:{" "}
+                        <span className={dirty ? "dirty" : ""}>{t("Em edição:")}{" "}
                           <b className={dirty ? "dirty" : ""}>
                             {e !== null ? formatValue(e, f.suffix) : "—"}
                           </b>
@@ -487,22 +458,17 @@ export default function CharacterPage() {
 
         {/* Snapshots / Evolução */}
         <section className="of-section mt-6 p-5">
-          <h2 className="of-label mb-1" style={{ color: "var(--of-primary)" }}>
-            Snapshots &amp; Evolução ({snapshots.length})
+          <h2 className="of-label mb-1" style={{ color: "var(--of-primary)" }}>{t("Snapshots & Evolução (")}{snapshots.length})
           </h2>
-          <p className="mb-4 text-xs" style={{ color: "var(--of-text-muted)" }}>
-            Salve um snapshot a cada atualização semanal para acompanhar sua
-            evolução.
-          </p>
+          <p className="mb-4 text-xs" style={{ color: "var(--of-text-muted)" }}>{t("Salve um snapshot a cada atualização semanal para acompanhar sua evolução.")} </p>
 
           {lastSnap && (
             <div
               className="mb-4 rounded-xl px-4 py-3 text-sm"
               style={{ background: "var(--of-surface-soft)" }}
-            >
-              Desde o último snapshot, seu Poder{" "}
+            >{t("Desde o último snapshot, seu Poder")}{" "}
               {deltaPoder === 0 ? (
-                <b>não mudou</b>
+                <b>{t("não mudou")}</b>
               ) : (
                 <b style={{ color: deltaPoder > 0 ? "#1a7f4b" : "#b42318" }}>
                   {deltaPoder > 0 ? "▲ +" : "▼ "}
@@ -514,9 +480,7 @@ export default function CharacterPage() {
           )}
 
           {snapshots.length === 0 ? (
-            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
-              Nenhum snapshot ainda.
-            </p>
+            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Nenhum snapshot ainda.")} </p>
           ) : (
             <div className="flex flex-col gap-2">
               {snapshots.map((s) => (
@@ -530,7 +494,7 @@ export default function CharacterPage() {
                       className="text-sm font-bold"
                       style={{ color: "var(--of-text)" }}
                     >
-                      {new Date(s.createdAt).toLocaleString("pt-BR")}
+                      {new Date(s.createdAt).toLocaleString(locale)}
                     </p>
                     <p className="text-xs" style={{ color: "var(--of-text-soft)" }}>
                       ⚡ {formatValue(s.attributes.poderGeral ?? 0)} · ❤{" "}
@@ -540,9 +504,7 @@ export default function CharacterPage() {
                   <button
                     className="of-btn-ghost"
                     onClick={() => handleDeleteSnapshot(s.id)}
-                  >
-                    Remover
-                  </button>
+                  >{t("Remover")} </button>
                 </div>
               ))}
             </div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { PanelTopbar } from "@/components/PanelTopbar";
@@ -12,6 +14,7 @@ import { canLead } from "@/lib/permissions";
 import { getSession } from "@/lib/session";
 
 export default function AnnouncementsPage() {
+  const { t, locale } = useLanguage();
   const router = useRouter();
   const [me, setMe] = useState<PublicMember | null>(null);
   const [members, setMembers] = useState<PublicMember[]>([]);
@@ -65,30 +68,24 @@ export default function AnnouncementsPage() {
         <h1
           className="text-xl font-extrabold tracking-tight sm:text-2xl"
           style={{ color: "var(--of-text)" }}
-        >
-          Mensagens da Liderança
-        </h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--of-text-soft)" }}>
-          Avisos e comunicados oficiais do clã.
-        </p>
+        >{t("Mensagens da Liderança")} </h1>
+        <p className="mt-1 text-sm" style={{ color: "var(--of-text-soft)" }}>{t("Avisos e comunicados oficiais do clã.")} </p>
 
         {manager && (
           <form onSubmit={handlePost} className="of-section mt-6 p-5">
-            <h2 className="of-label mb-4" style={{ color: "var(--of-primary)" }}>
-              Publicar aviso
-            </h2>
-            <label className="of-label mb-2 block">Título</label>
+            <h2 className="of-label mb-4" style={{ color: "var(--of-primary)" }}>{t("Publicar aviso")} </h2>
+            <label className="of-label mb-2 block">{t("Título")}</label>
             <input
               className="of-input"
-              placeholder="Ex: Reunião de WoE neste domingo"
+              placeholder={t("Ex: Reunião de WoE neste domingo")}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-            <label className="of-label mb-2 mt-4 block">Mensagem</label>
+            <label className="of-label mb-2 mt-4 block">{t("Mensagem")}</label>
             <textarea
               className="of-input"
               rows={4}
-              placeholder="Escreva o comunicado..."
+              placeholder={t("Escreva o comunicado...")}
               value={body}
               onChange={(e) => setBody(e.target.value)}
               style={{ resize: "vertical" }}
@@ -98,22 +95,16 @@ export default function AnnouncementsPage() {
               className="of-cta mt-4"
               style={{ width: "auto" }}
               disabled={!title.trim() || !body.trim()}
-            >
-              Publicar
-            </button>
+            >{t("Publicar")} </button>
           </form>
         )}
 
         <section className="mt-6 flex flex-col gap-4">
           {loading ? (
-            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
-              Carregando...
-            </p>
+            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Carregando...")} </p>
           ) : items.length === 0 ? (
             <div className="of-section p-6 text-center">
-              <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
-                Nenhum aviso publicado ainda.
-              </p>
+              <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Nenhum aviso publicado ainda.")} </p>
             </div>
           ) : (
             items.map((a) => (
@@ -129,9 +120,7 @@ export default function AnnouncementsPage() {
                     <button
                       className="of-btn-ghost shrink-0"
                       onClick={() => handleDelete(a.id)}
-                    >
-                      Excluir
-                    </button>
+                    >{t("Excluir")} </button>
                   )}
                 </div>
                 <p
@@ -144,8 +133,8 @@ export default function AnnouncementsPage() {
                   className="mt-3 text-xs"
                   style={{ color: "var(--of-text-muted)" }}
                 >
-                  {nameOf[a.authorId] ?? "Liderança"} ·{" "}
-                  {new Date(a.createdAt).toLocaleString("pt-BR")}
+                  {nameOf[a.authorId] ?? t("Liderança")} ·{" "}
+                  {new Date(a.createdAt).toLocaleString(locale)}
                 </p>
               </article>
             ))

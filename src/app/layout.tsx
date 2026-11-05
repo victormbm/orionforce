@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { LanguageProvider } from "@/components/LanguageProvider";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const metadata: Metadata = {
   title: "Orion Force — Gestão & Roster",
@@ -18,7 +20,10 @@ export default function RootLayout({
       <body>
         <div className="of-stars" aria-hidden />
         <div className="of-watermark" aria-hidden />
-        {children}
+        <LanguageProvider>
+          <div className="of-language-bar"><LanguageSwitcher /></div>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

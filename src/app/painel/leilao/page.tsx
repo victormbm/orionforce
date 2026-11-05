@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { PanelTopbar } from "@/components/PanelTopbar";
@@ -12,9 +14,10 @@ import {
 import { membersRepo, type PublicMember } from "@/lib/members";
 import { canLead } from "@/lib/permissions";
 import { getSession } from "@/lib/session";
-import { formatValue, parseNumber } from "@/lib/format";
+import { parseNumber } from "@/lib/format";
 
 export default function AuctionPage() {
+  const { t, locale, formatNumber: formatValue } = useLanguage();
   const router = useRouter();
   const [me, setMe] = useState<PublicMember | null>(null);
   const [members, setMembers] = useState<PublicMember[]>([]);
@@ -89,7 +92,7 @@ export default function AuctionPage() {
     setError(null);
     const amount = parseNumber(bidInput[lotId] ?? "");
     if (amount === null) {
-      setError("Informe um valor para o lance.");
+      setError(t("Informe um valor para o lance."));
       return;
     }
     try {
@@ -97,7 +100,7 @@ export default function AuctionPage() {
       setBidInput((prev) => ({ ...prev, [lotId]: "" }));
       await reload();
     } catch (err) {
-      setError(err instanceof BidError ? err.message : "Erro ao dar lance.");
+      setError(err instanceof BidError ? err.message : t("Erro ao dar lance."));
     }
   };
 
@@ -118,30 +121,24 @@ export default function AuctionPage() {
         <h1
           className="text-xl font-extrabold tracking-tight sm:text-2xl"
           style={{ color: "var(--of-text)" }}
-        >
-          Leilão Interno
-        </h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--of-text-soft)" }}>
-          Dispute itens da guild em zeny. Maior lance leva.
-        </p>
+        >{t("Leilão Interno")} </h1>
+        <p className="mt-1 text-sm" style={{ color: "var(--of-text-soft)" }}>{t("Dispute itens da guild em zeny. Maior lance leva.")} </p>
 
         {manager && (
           <form onSubmit={handleCreate} className="of-section mt-6 p-5">
-            <h2 className="of-label mb-4" style={{ color: "var(--of-primary)" }}>
-              Abrir lote
-            </h2>
+            <h2 className="of-label mb-4" style={{ color: "var(--of-primary)" }}>{t("Abrir lote")} </h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <label className="of-label mb-2 block">Item</label>
+                <label className="of-label mb-2 block">{t("Item")}</label>
                 <input
                   className="of-input"
-                  placeholder="Ex: Card Doppelganger"
+                  placeholder={t("Ex: Card Doppelganger")}
                   value={item}
                   onChange={(e) => setItem(e.target.value)}
                 />
               </div>
               <div>
-                <label className="of-label mb-2 block">Lance mínimo (z)</label>
+                <label className="of-label mb-2 block">{t("Lance mínimo (z)")}</label>
                 <input
                   className="of-input"
                   inputMode="numeric"
@@ -151,7 +148,7 @@ export default function AuctionPage() {
                 />
               </div>
               <div>
-                <label className="of-label mb-2 block">Encerra em</label>
+                <label className="of-label mb-2 block">{t("Encerra em")}</label>
                 <input
                   type="datetime-local"
                   className="of-input"
@@ -160,10 +157,10 @@ export default function AuctionPage() {
                 />
               </div>
               <div>
-                <label className="of-label mb-2 block">Descrição</label>
+                <label className="of-label mb-2 block">{t("Descrição")}</label>
                 <input
                   className="of-input"
-                  placeholder="Detalhes do item..."
+                  placeholder={t("Detalhes do item...")}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
@@ -174,9 +171,7 @@ export default function AuctionPage() {
               className="of-cta mt-4"
               style={{ width: "auto" }}
               disabled={!item.trim() || !endsAt}
-            >
-              Abrir leilão
-            </button>
+            >{t("Abrir leilão")} </button>
           </form>
         )}
 
@@ -185,20 +180,16 @@ export default function AuctionPage() {
             className="mt-4 rounded-xl px-4 py-3 text-sm font-medium"
             style={{ background: "#fde8e8", color: "#b42318" }}
           >
-            {error}
+            {t(error)}
           </p>
         )}
 
         <section className="mt-6 flex flex-col gap-4">
           {loading ? (
-            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
-              Carregando...
-            </p>
+            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Carregando...")} </p>
           ) : lots.length === 0 ? (
             <div className="of-section p-6 text-center">
-              <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
-                Nenhum leilão aberto.
-                {manager ? " Abra um lote acima! 👆" : ""}
+              <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Nenhum leilão aberto.")} {manager ? " " + t("Abra um lote acima! 👆") : ""}
               </p>
             </div>
           ) : (
@@ -224,7 +215,7 @@ export default function AuctionPage() {
                             background: ended ? "#8fa0bd" : "#30a46c",
                           }}
                         >
-                          {ended ? "Encerrado" : "Aberto"}
+                          {ended ? t("Encerrado") : t("Aberto")}
                         </span>
                       </div>
                       {lot.description && (
@@ -238,13 +229,11 @@ export default function AuctionPage() {
                       <p
                         className="mt-1 text-xs"
                         style={{ color: "var(--of-text-soft)" }}
-                      >
-                        🕒 encerra{" "}
-                        {new Date(lot.endsAt).toLocaleString("pt-BR", {
+                      >{t("🕒 encerra")}{" "}
+                        {new Date(lot.endsAt).toLocaleString(locale, {
                           dateStyle: "short",
                           timeStyle: "short",
-                        })}{" "}
-                        · mínimo {formatValue(lot.minBid)} z
+                        })}{" "}{t("· mínimo")} {formatValue(lot.minBid)} z
                       </p>
                     </div>
                     {manager && (
@@ -253,17 +242,13 @@ export default function AuctionPage() {
                           <button
                             className="of-btn-ghost"
                             onClick={() => handleClose(lot.id)}
-                          >
-                            Encerrar
-                          </button>
+                          >{t("Encerrar")} </button>
                         )}
                         <button
                           className="of-btn-ghost"
                           style={{ borderColor: "#e5484d", color: "#e5484d" }}
                           onClick={() => handleDelete(lot.id)}
-                        >
-                          Excluir
-                        </button>
+                        >{t("Excluir")} </button>
                       </div>
                     )}
                   </div>
@@ -274,22 +259,18 @@ export default function AuctionPage() {
                     style={{ background: "var(--of-surface-soft)" }}
                   >
                     {top ? (
-                      <p className="text-sm" style={{ color: "var(--of-text)" }}>
-                        🏆 Maior lance:{" "}
+                      <p className="text-sm" style={{ color: "var(--of-text)" }}>{t("🏆 Maior lance:")}{" "}
                         <b style={{ color: "var(--of-gold)" }}>
                           {formatValue(top.amount)} z
                         </b>{" "}
-                        <span style={{ color: "var(--of-text-soft)" }}>
-                          por {nameOf[top.memberId] ?? "?"}
+                        <span style={{ color: "var(--of-text-soft)" }}>{t("por")} {nameOf[top.memberId] ?? "?"}
                         </span>
                       </p>
                     ) : (
                       <p
                         className="text-sm"
                         style={{ color: "var(--of-text-muted)" }}
-                      >
-                        Nenhum lance ainda.
-                      </p>
+                      >{t("Nenhum lance ainda.")} </p>
                     )}
                   </div>
 
@@ -313,9 +294,7 @@ export default function AuctionPage() {
                         className="of-cta"
                         style={{ width: "auto", marginTop: 0 }}
                         onClick={() => handleBid(lot.id)}
-                      >
-                        Dar lance
-                      </button>
+                      >{t("Dar lance")} </button>
                     </div>
                   )}
                 </div>

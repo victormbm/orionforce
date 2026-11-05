@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -19,6 +21,7 @@ import { canLead, canManage } from "@/lib/permissions";
 import { clearSession } from "@/lib/session";
 
 export function PanelTopbar({ me }: { me: PublicMember }) {
+  const { t } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
   const myClass = getClass(me.classId);
@@ -44,16 +47,16 @@ export function PanelTopbar({ me }: { me: PublicMember }) {
   }, [pathname, me.id]);
 
   const nav = [
-    { href: "/painel", label: "Visão Geral" },
-    { href: "/painel/personagem", label: "Meu Personagem" },
-    { href: "/painel/eventos", label: "Eventos" },
-    { href: "/painel/avisos", label: "Avisos" },
-    { href: "/painel/leilao", label: "Leilão" },
+    { href: "/painel", label: t("Visão Geral") },
+    { href: "/painel/personagem", label: t("Meu Personagem") },
+    { href: "/painel/eventos", label: t("Eventos") },
+    { href: "/painel/avisos", label: t("Avisos") },
+    { href: "/painel/leilao", label: t("Leilão") },
     ...(canLead(me.guildRole)
       ? [{ href: "/painel/gvg", label: "GvG" }]
       : []),
     ...(canManage(me.guildRole)
-      ? [{ href: "/painel/lideranca", label: "Liderança" }]
+      ? [{ href: "/painel/lideranca", label: t("Liderança") }]
       : []),
   ];
 
@@ -66,8 +69,8 @@ export function PanelTopbar({ me }: { me: PublicMember }) {
     <header className="of-topbar">
       <div className="of-container flex items-center justify-between gap-3 py-3">
         {/* Marca + navegação */}
-        <div className="flex items-center gap-4">
-          <Link href="/painel" className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <Link href="/painel" className="flex shrink-0 items-center gap-2">
             <Image
               src="/orion-badge.png"
               alt="Orion Force"
@@ -83,7 +86,7 @@ export function PanelTopbar({ me }: { me: PublicMember }) {
             </span>
           </Link>
 
-          <nav className="flex items-center gap-1 overflow-x-auto">
+          <nav className="flex min-w-0 items-center gap-1 overflow-x-auto">
             {nav.map((item) => {
               const active = pathname === item.href;
               const section = pathToSection(item.href);
@@ -96,7 +99,7 @@ export function PanelTopbar({ me }: { me: PublicMember }) {
                 >
                   {item.label}
                   {alert && (
-                    <span className="of-nav-badge" title="Novidade!">
+                    <span className="of-nav-badge" title={t("Novidade!")}>
                       !
                     </span>
                   )}
@@ -107,7 +110,7 @@ export function PanelTopbar({ me }: { me: PublicMember }) {
         </div>
 
         {/* Usuário + sair */}
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-3">
           <div className="hidden text-right sm:block">
             <p
               className="text-sm font-bold leading-tight"
@@ -119,14 +122,12 @@ export function PanelTopbar({ me }: { me: PublicMember }) {
               className="text-[11px] leading-tight"
               style={{ color: roleInfo.color }}
             >
-              {roleInfo.label}
+              {t(roleInfo.label)}
               {myClass ? ` · ${myClass.name}` : ""}
             </p>
           </div>
           {myClass && <ClassIcon gameClass={myClass} size={40} />}
-          <button className="of-btn-ghost" onClick={logout}>
-            Sair
-          </button>
+          <button className="of-btn-ghost" onClick={logout}>{t("Sair")} </button>
         </div>
       </div>
     </header>

@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -13,9 +15,10 @@ type Mode = "login" | "register";
 
 const CREDENTIALS_KEY = "orionforce.credentials";
 
-type Feedback = { type: "ok" | "error" | "info"; text: string };
+type Feedback = { type: "ok" | "error" | "info"; text: string; values?: Record<string, string | number> };
 
 export default function AuthPage() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("login");
   const [nickname, setNickname] = useState("");
@@ -65,8 +68,9 @@ export default function AuthPage() {
     setFeedback({
       type: "ok",
       text: approved
-        ? `Cadastro concluído, ${member.nickname}! Você já pode acessar.`
-        : `Cadastro enviado, ${member.nickname}! Aguarde a aprovação da liderança para acessar.`,
+        ? "Cadastro concluído, {nickname}! Você já pode acessar."
+        : "Cadastro enviado, {nickname}! Aguarde a aprovação da liderança para acessar.",
+      values: { nickname: member.nickname },
     });
     setMode("login");
     setPin("");
@@ -86,7 +90,7 @@ export default function AuthPage() {
 
     setToken(token);
     setSession(member);
-    setFeedback({ type: "ok", text: `Bem-vindo, ${member.nickname}!` });
+    setFeedback({ type: "ok", text: "Bem-vindo, {nickname}!", values: { nickname: member.nickname } });
     router.push("/painel");
   };
 
@@ -149,7 +153,7 @@ export default function AuthPage() {
           <h1 className="mt-3 text-lg font-black tracking-tight" style={{ color: "var(--of-text)" }}>
             ORION <span style={{ color: "var(--of-primary)" }}>FORCE</span>
           </h1>
-          <p className="of-label mt-0.5">Gestão &amp; Roster · Ragnarok Origin</p>
+          <p className="of-label mt-0.5">{t("Gestão & Roster · Ragnarok Origin")}</p>
         </div>
 
         {/* Abas */}
@@ -162,15 +166,14 @@ export default function AuthPage() {
             className={`of-tab ${mode === "login" ? "of-tab--active" : ""}`}
             onClick={() => switchMode("login")}
           >
-            <IconLogin /> Login
+            <IconLogin /> {t("Login")}
           </button>
           <button
             type="button"
             className={`of-tab ${mode === "register" ? "of-tab--active" : ""}`}
             onClick={() => switchMode("register")}
           >
-            <IconUserPlus /> Cadastrar
-          </button>
+            <IconUserPlus /> {t("Cadastrar")} </button>
         </div>
 
         {/* Corpo: dados à esquerda, PIN à direita (empilha no mobile) */}
@@ -178,10 +181,10 @@ export default function AuthPage() {
           {/* ===== Coluna esquerda ===== */}
           <div>
             {/* Nickname */}
-            <label className="of-label mb-2 block">Nickname em jogo</label>
+            <label className="of-label mb-2 block">{t("Nickname em jogo")}</label>
         <input
           className="of-input"
-          placeholder="Ex: Korutan, Marcelao"
+          placeholder={t("Ex: Korutan, Marcelao")}
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
           autoComplete="off"
@@ -193,15 +196,11 @@ export default function AuthPage() {
             <p
               className="mt-3 text-xs leading-snug"
               style={{ color: "var(--of-text-muted)" }}
-            >
-              Após a aprovação da liderança, você poderá vincular sua conta
-              Discord em <strong>Meu Personagem → Atributos</strong>.
+            >{t("Após a aprovação da liderança, você poderá vincular sua conta Discord em")} <strong>{t("Meu Personagem → Atributos")}</strong>.
             </p>
 
             {/* Classe do personagem */}
-            <label className="of-label mt-5 mb-2 block">
-              Classe do personagem
-            </label>
+            <label className="of-label mt-5 mb-2 block">{t("Classe do personagem")} </label>
             <div className="flex items-stretch gap-3">
               <ClassIcon gameClass={selectedClass} size={52} />
               <div className="relative flex-1">
@@ -235,15 +234,11 @@ export default function AuthPage() {
               <span
                 className="block text-sm font-semibold"
                 style={{ color: "var(--of-text)" }}
-              >
-                Salvar Nick e PIN neste navegador
-              </span>
+              >{t("Salvar Nick e PIN neste navegador")} </span>
               <span
                 className="block text-xs leading-snug"
                 style={{ color: "var(--of-text-muted)" }}
-              >
-                Somente as credenciais são lembradas; a sessão não fica logada.
-              </span>
+              >{t("Somente as credenciais são lembradas; a sessão não fica logada.")} </span>
             </span>
           </label>
             )}
@@ -259,8 +254,8 @@ export default function AuthPage() {
           >
             <IconShield />{" "}
             {mode === "register"
-              ? "Criar senha PIN (4 dígitos)"
-              : "Digite sua senha PIN (4 dígitos)"}
+              ? t("Criar senha PIN (4 dígitos)")
+              : t("Digite sua senha PIN (4 dígitos)")}
           </span>
           <button
             type="button"
@@ -268,7 +263,7 @@ export default function AuthPage() {
             className="flex items-center gap-1 text-xs font-semibold"
             style={{ color: "var(--of-text-soft)" }}
           >
-            <IconEye /> {reveal ? "Ocultar" : "Revelar"}
+            <IconEye /> {reveal ? t("Ocultar") : t("Revelar")}
           </button>
         </div>
 
@@ -304,9 +299,7 @@ export default function AuthPage() {
             className="of-key of-key--muted"
             onClick={clearPin}
           >
-            <IconReset />
-            Limpar
-          </button>
+            <IconReset />{t("Limpar")} </button>
           <button type="button" className="of-key" onClick={() => addDigit("0")}>
             0
           </button>
@@ -315,9 +308,7 @@ export default function AuthPage() {
             className="of-key of-key--muted"
             onClick={removeDigit}
           >
-            <IconBackspace />
-            Apagar
-          </button>
+            <IconBackspace />{t("Apagar")} </button>
         </div>
           </div>
         </div>
@@ -340,7 +331,7 @@ export default function AuthPage() {
                     : "var(--of-primary-600)",
             }}
           >
-            {feedback.text}
+            {t(feedback.text, feedback.values)}
           </p>
         )}
 
@@ -351,11 +342,11 @@ export default function AuthPage() {
           disabled={!canSubmit || busy}
         >
           {busy ? (
-            "Processando…"
+            t("Processando…")
           ) : (
             <>
               {mode === "register" ? <IconUserPlus /> : <IconLogin />}
-              {mode === "login" ? "Acessar meu painel" : "Cadastrar e acessar"}
+              {mode === "login" ? t("Acessar meu painel") : t("Cadastrar e acessar")}
             </>
           )}
         </button>
@@ -364,9 +355,7 @@ export default function AuthPage() {
           <p
             className="mt-3 text-center text-xs"
             style={{ color: "var(--of-text-muted)" }}
-          >
-            Esqueceu o PIN? Peça para a liderança resetar o seu.
-          </p>
+          >{t("Esqueceu o PIN? Peça para a liderança resetar o seu.")} </p>
         )}
       </form>
     </main>

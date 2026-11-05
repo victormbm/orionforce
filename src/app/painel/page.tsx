@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ClassIcon } from "@/components/ClassIcon";
@@ -13,7 +15,6 @@ import {
 import { type PublicMember } from "@/lib/members";
 import { membersRepo } from "@/lib/members";
 import { getSession } from "@/lib/session";
-import { formatValue } from "@/lib/format";
 
 const ROLE_ORDER: Role[] = ["DPS", "SUP", "MDPS", "TANK"];
 const ROLE_LABEL: Record<Role, string> = {
@@ -24,6 +25,7 @@ const ROLE_LABEL: Record<Role, string> = {
 };
 
 export default function PanelPage() {
+  const { t, formatNumber: formatValue } = useLanguage();
   const router = useRouter();
   const [me, setMe] = useState<PublicMember | null>(null);
   const [members, setMembers] = useState<PublicMember[]>([]);
@@ -92,25 +94,22 @@ export default function PanelPage() {
         <h1
           className="text-xl font-extrabold tracking-tight sm:text-2xl"
           style={{ color: "var(--of-text)" }}
-        >
-          Bem-vindo, {me.nickname}! 👋
+        >{t("Bem-vindo,")} {me.nickname}! 👋
         </h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--of-text-soft)" }}>
-          Visão geral e roster do clã Orion Force.
-        </p>
+        <p className="mt-1 text-sm" style={{ color: "var(--of-text-soft)" }}>{t("Visão geral e roster do clã Orion Force.")} </p>
 
         {/* Estatísticas */}
         <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           <div className="of-tile">
             <div className="of-tile-value">{stats.total}</div>
-            <div className="of-tile-label">Membros</div>
+            <div className="of-tile-label">{t("Membros")}</div>
           </div>
           {ROLE_ORDER.map((role) => (
             <div key={role} className="of-tile">
               <div className="of-tile-value" style={{ color: ROLE_COLOR[role] }}>
                 {stats.byRole[role]}
               </div>
-              <div className="of-tile-label">{ROLE_LABEL[role]}</div>
+              <div className="of-tile-label">{t(ROLE_LABEL[role])}</div>
             </div>
           ))}
           <div className="of-tile">
@@ -120,19 +119,15 @@ export default function PanelPage() {
             >
               {formatValue(stats.poderTotal)}
             </div>
-            <div className="of-tile-label">Poder total</div>
+            <div className="of-tile-label">{t("Poder total")}</div>
           </div>
         </section>
 
         {/* Composição */}
         <section className="of-section mt-6 p-5">
-          <h2 className="of-label mb-4" style={{ color: "var(--of-primary)" }}>
-            Composição do clã
-          </h2>
+          <h2 className="of-label mb-4" style={{ color: "var(--of-primary)" }}>{t("Composição do clã")} </h2>
           {stats.total === 0 ? (
-            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
-              Ninguém cadastrado ainda.
-            </p>
+            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Ninguém cadastrado ainda.")} </p>
           ) : (
             <div className="flex flex-col gap-3">
               {ROLE_ORDER.map((role) => {
@@ -145,7 +140,7 @@ export default function PanelPage() {
                         className="font-bold"
                         style={{ color: "var(--of-text)" }}
                       >
-                        {ROLE_LABEL[role]}
+                        {t(ROLE_LABEL[role])}
                       </span>
                       <span style={{ color: "var(--of-text-soft)" }}>
                         {count} · {pct}%
@@ -167,12 +162,11 @@ export default function PanelPage() {
         {/* Roster */}
         <section className="of-section mt-6 p-5">
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="of-label" style={{ color: "var(--of-primary)" }}>
-              Roster ({filtered.length})
+            <h2 className="of-label" style={{ color: "var(--of-primary)" }}>{t("Roster (")}{filtered.length})
             </h2>
             <input
               className="of-input sm:max-w-[260px]"
-              placeholder="Buscar por nick ou classe..."
+              placeholder={t("Buscar por nick ou classe...")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -182,28 +176,22 @@ export default function PanelPage() {
             <button
               className={`of-chip ${roleFilter === "ALL" ? "of-chip--active" : ""}`}
               onClick={() => setRoleFilter("ALL")}
-            >
-              Todos
-            </button>
+            >{t("Todos")} </button>
             {ROLE_ORDER.map((role) => (
               <button
                 key={role}
                 className={`of-chip ${roleFilter === role ? "of-chip--active" : ""}`}
                 onClick={() => setRoleFilter(role)}
               >
-                {ROLE_LABEL[role]}
+                {t(ROLE_LABEL[role])}
               </button>
             ))}
           </div>
 
           {loading ? (
-            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
-              Carregando...
-            </p>
+            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Carregando...")} </p>
           ) : filtered.length === 0 ? (
-            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>
-              Nenhum membro encontrado.
-            </p>
+            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Nenhum membro encontrado.")} </p>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((m) => {
@@ -247,7 +235,7 @@ export default function PanelPage() {
                       className="of-role-pill shrink-0"
                       style={{ background: roleInfo.color }}
                     >
-                      {roleInfo.label}
+                      {t(roleInfo.label)}
                     </span>
                   </div>
                 );
