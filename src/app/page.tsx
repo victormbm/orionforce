@@ -359,6 +359,15 @@ export default function AuthPage() {
             </>
           )}
         </button>
+
+        {mode === "login" && (
+          <p
+            className="mt-3 text-center text-xs"
+            style={{ color: "var(--of-text-muted)" }}
+          >
+            Esqueceu o PIN? Peça para a liderança resetar o seu.
+          </p>
+        )}
       </form>
     </main>
   );

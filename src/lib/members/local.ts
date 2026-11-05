@@ -123,6 +123,30 @@ export const localMembersRepo: MembersRepository = {
     writeAll(readAll().filter((m) => m.id !== id));
   },
 
+  async changePin(id, currentPin, newPin) {
+    if (!/^\d{4}$/.test(newPin)) {
+      throw new AuthError("INVALID_INPUT", "O novo PIN deve ter 4 dígitos.");
+    }
+    const all = readAll();
+    const m = all.find((x) => x.id === id);
+    if (!m) throw new AuthError("NOT_FOUND", "Membro não encontrado.");
+    if (m.pinHash !== (await hashPin(currentPin))) {
+      throw new AuthError("WRONG_PIN", "PIN atual incorreto.");
+    }
+    m.pinHash = await hashPin(newPin);
+    writeAll(all);
+  },
+
+  async resetPin(id) {
+    const all = readAll();
+    const m = all.find((x) => x.id === id);
+    if (!m) throw new AuthError("NOT_FOUND", "Membro não encontrado.");
+    const pin = String(Math.floor(1000 + Math.random() * 9000));
+    m.pinHash = await hashPin(pin);
+    writeAll(all);
+    return pin;
+  },
+
   async setDiscord(id, discord) {
     const all = readAll();
     const member = all.find((m) => m.id === id);

@@ -52,6 +52,14 @@ export default function LeadershipPage() {
     await reload();
   };
 
+  const resetPin = async (id: string, nickname: string) => {
+    if (!confirm(`Resetar o PIN de ${nickname}?`)) return;
+    const pin = await membersRepo.resetPin(id);
+    alert(
+      `PIN de ${nickname} resetado para: ${pin}\n\nPasse esse PIN temporário para a pessoa. Ela pode trocar depois em "Meu Personagem".`
+    );
+  };
+
   const pendings = members.filter((m) => m.status === "pendente");
   const approved = members.filter((m) => m.status === "aprovado");
 
@@ -190,6 +198,12 @@ export default function LeadershipPage() {
                     </span>
                   </div>
 
+                  <button
+                    className="of-btn-ghost shrink-0"
+                    onClick={() => resetPin(m.id, m.nickname)}
+                  >
+                    Resetar PIN
+                  </button>
                   <button
                     className="of-btn-ghost shrink-0"
                     style={{ borderColor: "#e5484d", color: "#e5484d" }}

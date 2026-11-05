@@ -34,6 +34,8 @@ export default function CharacterPage() {
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [busy, setBusy] = useState(false);
   const [discord, setDiscord] = useState("");
+  const [pinCur, setPinCur] = useState("");
+  const [pinNew, setPinNew] = useState("");
 
   useEffect(() => {
     const session = getSession();
@@ -142,6 +144,21 @@ export default function CharacterPage() {
     setFeedback({ type: "ok", text: "Discord atualizado!" });
   };
 
+  const handleChangePin = async () => {
+    if (!me) return;
+    try {
+      await membersRepo.changePin(me.id, pinCur, pinNew);
+      setPinCur("");
+      setPinNew("");
+      setFeedback({ type: "ok", text: "PIN alterado com sucesso!" });
+    } catch (e) {
+      setFeedback({
+        type: "error",
+        text: e instanceof Error ? e.message : "Erro ao trocar o PIN.",
+      });
+    }
+  };
+
   if (!me) return null;
 
   const myClass = getClass(me.classId);
@@ -240,6 +257,41 @@ export default function CharacterPage() {
               disabled={(discord.trim() || "") === (me.discord ?? "")}
             >
               Salvar Discord
+            </button>
+          </div>
+        </section>
+
+        {/* Trocar PIN */}
+        <section className="of-section mt-4 p-5">
+          <h2 className="of-label" style={{ color: "var(--of-primary)" }}>
+            Trocar PIN
+          </h2>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <input
+              className="of-input"
+              style={{ maxWidth: 150 }}
+              inputMode="numeric"
+              maxLength={4}
+              placeholder="PIN atual"
+              value={pinCur}
+              onChange={(e) => setPinCur(e.target.value.replace(/\D/g, ""))}
+            />
+            <input
+              className="of-input"
+              style={{ maxWidth: 150 }}
+              inputMode="numeric"
+              maxLength={4}
+              placeholder="Novo PIN"
+              value={pinNew}
+              onChange={(e) => setPinNew(e.target.value.replace(/\D/g, ""))}
+            />
+            <button
+              className="of-cta"
+              style={{ width: "auto", marginTop: 0 }}
+              onClick={handleChangePin}
+              disabled={pinCur.length !== 4 || pinNew.length !== 4}
+            >
+              Salvar PIN
             </button>
           </div>
         </section>

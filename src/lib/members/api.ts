@@ -83,4 +83,19 @@ export const apiMembersRepo: MembersRepository = {
       method: "PATCH",
       body: JSON.stringify({ discord }),
     }),
+
+  changePin: async (id, currentPin, newPin) => {
+    await request(`/api/members/${id}/pin`, {
+      method: "PATCH",
+      body: JSON.stringify({ currentPin, newPin }),
+    });
+  },
+
+  resetPin: async (id) => {
+    const r = await request<{ pin: string }>(`/api/members/${id}/pin`, {
+      method: "PATCH",
+      body: JSON.stringify({}),
+    });
+    return r.pin;
+  },
 };
