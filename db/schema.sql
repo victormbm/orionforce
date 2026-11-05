@@ -86,7 +86,8 @@ CREATE INDEX IF NOT EXISTS bids_lot ON bids (lot_id, amount DESC);
 -- ---------- Escalação de GvG ----------
 CREATE TABLE IF NOT EXISTS gvg_assignments (
   member_id   UUID PRIMARY KEY REFERENCES members(id) ON DELETE CASCADE,
-  grp         TEXT NOT NULL CHECK (grp IN ('elite', 'secundaria'))
+  grp         TEXT NOT NULL CHECK (grp IN ('elite', 'secundaria')),
+  party       SMALLINT NOT NULL DEFAULT 1 CHECK (party BETWEEN 1 AND 8)
 );
 
 -- ---------- Controle de tentativas de login (anti força-bruta) ----------

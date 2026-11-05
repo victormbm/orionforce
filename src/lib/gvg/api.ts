@@ -1,19 +1,15 @@
 import { apiFetch } from "@/lib/http";
-import type { GvgGroup, GvgRepository } from "./types";
+import type { GvgAssignments, GvgRepository } from "./types";
 
-/** Implementação via API (Neon) da escalação de GvG. */
 export const apiGvgRepo: GvgRepository = {
-  getAssignments: () =>
-    apiFetch<Record<string, GvgGroup>>("/api/gvg"),
-
-  assign: async (memberId, group) => {
+  getAssignments: () => apiFetch<GvgAssignments>("/api/gvg"),
+  assign: async (memberId, target) => {
     await apiFetch("/api/gvg", {
       method: "PUT",
-      body: JSON.stringify({ memberId, group }),
+      body: JSON.stringify({ memberId, group: target?.group ?? null, party: target?.party }),
     });
   },
-
-  clear: async () => {
-    await apiFetch("/api/gvg", { method: "DELETE" });
+  clear: async (target) => {
+    await apiFetch("/api/gvg", { method: "DELETE", body: JSON.stringify(target) });
   },
 };

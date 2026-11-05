@@ -1,37 +1,18 @@
-import type { GvgGroup, GvgRepository } from "./types";
+import type { GvgAssignments, GvgRepository } from "./types";
+import { clearParty, moveMember, normalizeAssignments } from "./lineup";
 
-/** Implementação LOCAL (localStorage) da escalação de GvG. */
 const KEY = "orionforce.gvg";
-
-type AssignMap = Record<string, GvgGroup>;
-
-function readAll(): AssignMap {
+function readAll(): GvgAssignments {
   if (typeof window === "undefined") return {};
   try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as AssignMap) : {};
-  } catch {
-    return {};
-  }
+    const raw = JSON.parse(localStorage.getItem(KEY) ?? "{}");
+    return raw && typeof raw === "object" && !Array.isArray(raw) ? normalizeAssignments(raw) : {};
+  } catch { return {}; }
 }
-
-function writeAll(map: AssignMap): void {
-  localStorage.setItem(KEY, JSON.stringify(map));
-}
-
 export const localGvgRepo: GvgRepository = {
-  async getAssignments() {
-    return readAll();
+  async getAssignments() { return readAll(); },
+  async assign(memberId, target) {
+    localStorage.setItem(KEY, JSON.stringify(moveMember(readAll(), memberId, target)));
   },
-
-  async assign(memberId, group) {
-    const map = readAll();
-    if (group === null) delete map[memberId];
-    else map[memberId] = group;
-    writeAll(map);
-  },
-
-  async clear() {
-    writeAll({});
-  },
+  async clear(target) { localStorage.setItem(KEY, JSON.stringify(clearParty(readAll(), target))); },
 };
