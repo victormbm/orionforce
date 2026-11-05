@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter as useRouter, PageLoading, LoadingIndicator } from "@/components/LoadingProvider";
 import { ClassIcon } from "@/components/ClassIcon";
 import { useLanguage } from "@/components/LanguageProvider";
 import { PanelTopbar } from "@/components/PanelTopbar";
@@ -158,7 +158,7 @@ export default function GvgPage() {
     );
   };
 
-  if (!me) return null;
+  if (!me) return <PageLoading />;
   const available = membersAt(null);
   const assigned = members.filter(member => assignments[member.id]);
 
@@ -174,7 +174,7 @@ export default function GvgPage() {
           </div>
         </div>
         {error && <p role="alert" className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{t(error)}</p>}
-        {loading ? <p className="mt-6 text-sm">{t("Carregando...")}</p> : (
+        {loading ? <p className="mt-6 text-sm"><LoadingIndicator /></p> : (
           <div className="of-gvg-board mt-6" aria-busy={busy}>
             <aside className={`of-gvg-col of-gvg-available ${over === "available" ? "of-gvg-col--over" : ""}`} {...dropZone(null)}>
               <div className="mb-4 flex items-center justify-between gap-2">

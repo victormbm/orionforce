@@ -1,3 +1,4 @@
+import { trackRepository } from "@/lib/loading";
 import { apiMembersRepo } from "./api";
 import { localMembersRepo } from "./local";
 import type { MembersRepository } from "./types";
@@ -14,6 +15,6 @@ import type { MembersRepository } from "./types";
 const backend = process.env.NEXT_PUBLIC_DATA_BACKEND === "local" ? "local" : "api";
 
 export const membersRepo: MembersRepository =
-  backend === "api" ? apiMembersRepo : localMembersRepo;
+  trackRepository(backend === "api" ? apiMembersRepo : localMembersRepo);
 
 export * from "./types";

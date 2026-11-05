@@ -251,4 +251,5 @@ export const messages: Record<string, [string, string]> = {
 "Limpar o Grupo {number} de {team}? Os jogadores voltarão para Disponíveis.": ["Clear Party {number} in {team}? Players will return to Available.","¿Vaciar el Grupo {number} de {team}? Los jugadores volverán a Disponibles."],
 "Limpar Grupo {number} de {team}": ["Clear Party {number} in {team}","Vaciar Grupo {number} de {team}"],
 "Solte aqui para voltar a Disponíveis": ["Drop here to return to Available","Suelta aquí para volver a Disponibles"],
+"Erro ao carregar personagem.": ["Unable to load character.", "Error al cargar el personaje."],
 };

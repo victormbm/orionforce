@@ -2,7 +2,7 @@
 
 import { useLanguage } from "@/components/LanguageProvider";
 
-import { useRouter } from "next/navigation";
+import { useLoadingRouter as useRouter, PageLoading, LoadingIndicator } from "@/components/LoadingProvider";
 import { useEffect, useMemo, useState } from "react";
 import { ClassIcon } from "@/components/ClassIcon";
 import { PanelTopbar } from "@/components/PanelTopbar";
@@ -84,7 +84,7 @@ export default function PanelPage() {
       );
   }, [approved, search, roleFilter, summaries]);
 
-  if (!me) return null;
+  if (!me) return <PageLoading />;
 
   return (
     <div className="relative z-10 min-h-screen pb-16">
@@ -189,7 +189,7 @@ export default function PanelPage() {
           </div>
 
           {loading ? (
-            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Carregando...")} </p>
+            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}><LoadingIndicator /> </p>
           ) : filtered.length === 0 ? (
             <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Nenhum membro encontrado.")} </p>
           ) : (

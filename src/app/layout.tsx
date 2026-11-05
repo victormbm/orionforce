@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { LanguageProvider } from "@/components/LanguageProvider";
+import { LoadingProvider } from "@/components/LoadingProvider";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const metadata: Metadata = {
@@ -21,8 +22,10 @@ export default function RootLayout({
         <div className="of-stars" aria-hidden />
         <div className="of-watermark" aria-hidden />
         <LanguageProvider>
-          <div className="of-language-bar"><LanguageSwitcher /></div>
-          {children}
+          <LoadingProvider>
+            <div className="of-language-bar"><LanguageSwitcher /></div>
+            {children}
+          </LoadingProvider>
         </LanguageProvider>
       </body>
     </html>

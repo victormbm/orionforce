@@ -604,3 +604,18 @@ body {
 .of-gvg-clear:hover:not(:disabled) { border-color: #e5484d; color: #c52a31; background: #fff1f2; }
 .of-gvg-clear:disabled { cursor: default; opacity: .45; }
 .of-gvg-clear:focus-visible { outline: 2px solid var(--of-primary); outline-offset: 2px; }
+/* Shared loading feedback: thin progress bar + compact status pill. */
+.of-global-loading { position: fixed; inset: 0; z-index: 100; pointer-events: none; }
+.of-loading-progress { position: absolute; top: 0; left: 0; right: 0; height: 3px; overflow: hidden; background: #2f6bff18; }
+.of-loading-progress > span { display: block; width: 35%; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--of-primary), var(--of-cyan)); animation: of-progress 1.2s ease-in-out infinite; box-shadow: 0 0 10px #2f6bff50; }
+.of-loading-pill { position: absolute; right: max(20px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 10px; border: 1px solid var(--of-border); border-radius: 999px; padding: 12px 18px; background: #ffffffed; backdrop-filter: blur(12px); box-shadow: var(--of-shadow); color: var(--of-text); font-size: 13px; font-weight: 600; animation: of-loading-appear .18s ease-out; }
+.of-loading-spinner { display: inline-block; flex-shrink: 0; width: 19px; height: 19px; border: 2px solid var(--of-primary-100); border-top-color: var(--of-primary); border-right-color: var(--of-cyan); border-radius: 50%; animation: of-spin .75s linear infinite; }
+.of-page-loading { min-height: 220px; display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--of-text-soft); font-size: 14px; }
+@keyframes of-spin { to { transform: rotate(360deg); } }
+@keyframes of-progress { from { transform: translateX(-110%); } to { transform: translateX(400%); } }
+@keyframes of-loading-appear { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .of-loading-spinner, .of-loading-pill { animation: none; }
+  .of-loading-progress > span { animation: none; width: 100%; opacity: .65; }
+}
+.of-loading-inline { display: inline-flex; align-items: center; gap: 10px; color: var(--of-text-soft); }

@@ -2,7 +2,7 @@
 
 import { useLanguage } from "@/components/LanguageProvider";
 
-import { useRouter } from "next/navigation";
+import { useLoadingRouter as useRouter, PageLoading, LoadingIndicator } from "@/components/LoadingProvider";
 import { useEffect, useMemo, useState } from "react";
 import { PanelTopbar } from "@/components/PanelTopbar";
 import {
@@ -59,7 +59,7 @@ export default function AuctionPage() {
     return map;
   }, [members]);
 
-  if (!me) return null;
+  if (!me) return <PageLoading />;
   const manager = canLead(me.guildRole);
 
   const highestOf = (lotId: string): Bid | null => {
@@ -186,7 +186,7 @@ export default function AuctionPage() {
 
         <section className="mt-6 flex flex-col gap-4">
           {loading ? (
-            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Carregando...")} </p>
+            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}><LoadingIndicator /> </p>
           ) : lots.length === 0 ? (
             <div className="of-section p-6 text-center">
               <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Nenhum leilão aberto.")} {manager ? " " + t("Abra um lote acima! 👆") : ""}

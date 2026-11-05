@@ -2,7 +2,7 @@
 
 import { useLanguage } from "@/components/LanguageProvider";
 
-import { useRouter } from "next/navigation";
+import { useLoadingRouter as useRouter, PageLoading } from "@/components/LoadingProvider";
 import { useEffect, useMemo, useState } from "react";
 import { ClassIcon } from "@/components/ClassIcon";
 import { PanelTopbar } from "@/components/PanelTopbar";
@@ -36,6 +36,8 @@ export default function CharacterPage() {
   const [showAll, setShowAll] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [busy, setBusy] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [discord, setDiscord] = useState("");
   const [pinCur, setPinCur] = useState("");
   const [pinNew, setPinNew] = useState("");
@@ -58,7 +60,9 @@ export default function CharacterPage() {
       setSaved(attrs);
       setEdit(toEditMap(attrs));
       setSnapshots(snaps);
-    });
+    })
+      .catch(error => setLoadError(error instanceof Error ? error.message : "Erro ao carregar personagem."))
+      .finally(() => setInitialLoading(false));
   }, [router]);
 
   const role = me ? getClass(me.classId)?.role : undefined;
@@ -178,7 +182,15 @@ export default function CharacterPage() {
     }
   };
 
-  if (!me) return null;
+  if (!me) return <PageLoading />;
+  if (initialLoading || loadError) return (
+    <div className="relative z-10 min-h-screen">
+      <PanelTopbar me={me} />
+      <main className="of-container pt-7">
+        {initialLoading ? <PageLoading /> : <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-700">{t(loadError)}</p>}
+      </main>
+    </div>
+  );
 
   const myClass = getClass(me.classId);
   const currentPoder = editNum("poderGeral") ?? saved.poderGeral ?? 0;

@@ -3,7 +3,7 @@
 import { useLanguage } from "@/components/LanguageProvider";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter as useRouter } from "@/components/LoadingProvider";
 import { useEffect, useMemo, useState } from "react";
 import { ClassIcon } from "@/components/ClassIcon";
 import { CLASSES, getClass } from "@/data/classes";

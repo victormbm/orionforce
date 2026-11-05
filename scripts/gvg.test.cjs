@@ -87,6 +87,7 @@ test('dragging an assigned player back to Available persists removal, without wa
     react: mockReact,
     'react/jsx-runtime': require('react/jsx-runtime'),
     'next/navigation': { useRouter: () => ({ replace() {} }) },
+    '@/components/LoadingProvider': { useLoadingRouter: () => ({ replace() {} }) },
     '@/components/ClassIcon': { ClassIcon: () => null },
     '@/components/PanelTopbar': { PanelTopbar: () => null },
     '@/components/LanguageProvider': { useLanguage: () => ({ t: (s, values) => s.replace(/\{(\w+)\}/g, (m, key) => values?.[key] ?? m), formatNumber: String }) },

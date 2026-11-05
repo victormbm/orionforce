@@ -2,7 +2,7 @@
 
 import { useLanguage } from "@/components/LanguageProvider";
 
-import { useRouter } from "next/navigation";
+import { useLoadingRouter as useRouter, PageLoading, LoadingIndicator } from "@/components/LoadingProvider";
 import { useEffect, useState } from "react";
 import { ClassIcon } from "@/components/ClassIcon";
 import { PanelTopbar } from "@/components/PanelTopbar";
@@ -43,7 +43,7 @@ export default function LeadershipPage() {
     reload().finally(() => setLoading(false));
   }, [router]);
 
-  if (!me) return null;
+  if (!me) return <PageLoading />;
 
   const changeRole = async (id: string, role: GuildRole) => {
     await membersRepo.setGuildRole(id, role);
@@ -93,7 +93,7 @@ export default function LeadershipPage() {
           <h2 className="of-label mb-4" style={{ color: "var(--of-gold)" }}>{t("Cadastros pendentes (")}{pendings.length})
           </h2>
           {loading ? (
-            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Carregando...")} </p>
+            <p className="text-sm" style={{ color: "var(--of-text-muted)" }}><LoadingIndicator /> </p>
           ) : pendings.length === 0 ? (
             <p className="text-sm" style={{ color: "var(--of-text-muted)" }}>{t("Nenhum cadastro aguardando aprovação. 🎉")} </p>
           ) : (
