@@ -8,7 +8,7 @@ import {
   type Announcement,
 } from "@/lib/announcements";
 import { membersRepo, type PublicMember } from "@/lib/members";
-import { canManage } from "@/lib/permissions";
+import { canLead } from "@/lib/permissions";
 import { getSession } from "@/lib/session";
 
 export default function AnnouncementsPage() {
@@ -41,7 +41,7 @@ export default function AnnouncementsPage() {
   }, [members]);
 
   if (!me) return null;
-  const manager = canManage(me.guildRole);
+  const manager = canLead(me.guildRole);
 
   const handlePost = async (e: React.FormEvent) => {
     e.preventDefault();

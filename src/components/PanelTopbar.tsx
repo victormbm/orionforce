@@ -3,11 +3,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { ClassIcon } from "@/components/ClassIcon";
 import { getClass } from "@/data/classes";
 import { GUILD_ROLE_INFO } from "@/data/roles";
+import {
+  fetchActivity,
+  hasNew,
+  markSeen,
+  pathToSection,
+  type Activity,
+} from "@/lib/activity";
 import { type PublicMember } from "@/lib/members";
-import { canManage } from "@/lib/permissions";
+import { canLead, canManage } from "@/lib/permissions";
 import { clearSession } from "@/lib/session";
 
 export function PanelTopbar({ me }: { me: PublicMember }) {
@@ -16,17 +24,36 @@ export function PanelTopbar({ me }: { me: PublicMember }) {
   const myClass = getClass(me.classId);
   const roleInfo = GUILD_ROLE_INFO[me.guildRole];
 
+  const [activity, setActivity] = useState<Activity | null>(null);
+  // força recálculo dos badges após marcar uma seção como vista
+  const [, setSeenTick] = useState(0);
+
+  useEffect(() => {
+    fetchActivity()
+      .then(setActivity)
+      .catch(() => {});
+  }, [pathname]);
+
+  // Ao abrir uma seção com alerta, marca como vista (limpa o badge).
+  useEffect(() => {
+    const section = pathToSection(pathname);
+    if (section) {
+      markSeen(me.id, section);
+      setSeenTick((t) => t + 1);
+    }
+  }, [pathname, me.id]);
+
   const nav = [
     { href: "/painel", label: "Visão Geral" },
     { href: "/painel/personagem", label: "Meu Personagem" },
     { href: "/painel/eventos", label: "Eventos" },
     { href: "/painel/avisos", label: "Avisos" },
     { href: "/painel/leilao", label: "Leilão" },
+    ...(canLead(me.guildRole)
+      ? [{ href: "/painel/gvg", label: "GvG" }]
+      : []),
     ...(canManage(me.guildRole)
-      ? [
-          { href: "/painel/gvg", label: "GvG" },
-          { href: "/painel/lideranca", label: "Liderança" },
-        ]
+      ? [{ href: "/painel/lideranca", label: "Liderança" }]
       : []),
   ];
 
@@ -59,6 +86,8 @@ export function PanelTopbar({ me }: { me: PublicMember }) {
           <nav className="flex items-center gap-1 overflow-x-auto">
             {nav.map((item) => {
               const active = pathname === item.href;
+              const section = pathToSection(item.href);
+              const alert = section ? hasNew(activity, me.id, section) : false;
               return (
                 <Link
                   key={item.href}
@@ -66,6 +95,11 @@ export function PanelTopbar({ me }: { me: PublicMember }) {
                   className={`of-nav-link ${active ? "of-nav-link--active" : ""}`}
                 >
                   {item.label}
+                  {alert && (
+                    <span className="of-nav-badge" title="Novidade!">
+                      !
+                    </span>
+                  )}
                 </Link>
               );
             })}

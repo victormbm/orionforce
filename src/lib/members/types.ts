@@ -7,7 +7,7 @@
  * `src/lib/members/index.ts` — nada na tela muda.
  */
 
-export type GuildRole = "recruta" | "membro" | "oficial" | "lider";
+export type GuildRole = "recruta" | "membro" | "oficial" | "vice" | "lider";
 
 /** Situação do cadastro: aguardando aprovação ou liberado. */
 export type MemberStatus = "pendente" | "aprovado";

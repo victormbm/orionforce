@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { authenticate, forbidden, isManager, unauthorized } from "@/lib/auth";
+import { authenticate, canLead, forbidden, unauthorized } from "@/lib/auth";
 import { getSql } from "@/lib/db";
 
 export async function POST(
@@ -8,7 +8,7 @@ export async function POST(
 ) {
   const me = await authenticate(req);
   if (!me) return unauthorized();
-  if (!isManager(me)) return forbidden();
+  if (!canLead(me)) return forbidden();
   const { id } = await params;
   const sql = getSql();
   await sql`UPDATE auction_lots SET closed = true WHERE id = ${id}`;

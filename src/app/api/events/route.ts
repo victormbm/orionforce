@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { authenticate, forbidden, isManager, unauthorized } from "@/lib/auth";
+import { authenticate, canLead, forbidden, unauthorized } from "@/lib/auth";
 import { getSql } from "@/lib/db";
 
 export async function GET(req: Request) {
@@ -16,7 +16,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const me = await authenticate(req);
   if (!me) return unauthorized();
-  if (!isManager(me)) return forbidden();
+  if (!canLead(me)) return forbidden();
   const { title, type, startsAt, notes, createdBy } = await req.json();
   if (!String(title ?? "").trim() || !startsAt || !type) {
     return NextResponse.json(

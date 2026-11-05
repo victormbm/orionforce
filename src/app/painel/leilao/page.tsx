@@ -10,7 +10,7 @@ import {
   type Bid,
 } from "@/lib/auctions";
 import { membersRepo, type PublicMember } from "@/lib/members";
-import { canManage } from "@/lib/permissions";
+import { canLead } from "@/lib/permissions";
 import { getSession } from "@/lib/session";
 import { formatValue, parseNumber } from "@/lib/format";
 
@@ -57,7 +57,7 @@ export default function AuctionPage() {
   }, [members]);
 
   if (!me) return null;
-  const manager = canManage(me.guildRole);
+  const manager = canLead(me.guildRole);
 
   const highestOf = (lotId: string): Bid | null => {
     const arr = bids[lotId] ?? [];

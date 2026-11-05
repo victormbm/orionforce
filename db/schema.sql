@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS members (
   pin_hash    TEXT NOT NULL,
   class_id    TEXT NOT NULL,
   guild_role  TEXT NOT NULL DEFAULT 'recruta'
-              CHECK (guild_role IN ('recruta', 'membro', 'oficial', 'lider')),
+              CHECK (guild_role IN ('recruta', 'membro', 'oficial', 'vice', 'lider')),
   status      TEXT NOT NULL DEFAULT 'pendente'
               CHECK (status IN ('pendente', 'aprovado')),
   discord     TEXT,

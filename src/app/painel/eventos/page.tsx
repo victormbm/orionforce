@@ -10,7 +10,7 @@ import {
   type GuildEvent,
 } from "@/lib/events";
 import { membersRepo, type PublicMember } from "@/lib/members";
-import { canManage } from "@/lib/permissions";
+import { canLead } from "@/lib/permissions";
 import { getSession } from "@/lib/session";
 
 const EVENT_TYPES: EventType[] = ["WoE", "GvG", "MVP", "Outro"];
@@ -69,7 +69,7 @@ export default function EventsPage() {
   }, [members]);
 
   if (!me) return null;
-  const manager = canManage(me.guildRole);
+  const manager = canLead(me.guildRole);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();

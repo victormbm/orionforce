@@ -85,7 +85,19 @@ export async function authenticate(req: Request): Promise<AuthMember | null> {
 }
 
 export function isManager(m: AuthMember): boolean {
-  return m.guildRole === "oficial" || m.guildRole === "lider";
+  return (
+    m.guildRole === "oficial" ||
+    m.guildRole === "vice" ||
+    m.guildRole === "lider"
+  );
+}
+
+/**
+ * Liderança plena (eventos, avisos, leilão, GvG, cargos, remover membros):
+ * apenas Líder e Vice-Líder. Oficial só aprova membros e reseta PIN.
+ */
+export function canLead(m: AuthMember): boolean {
+  return m.guildRole === "vice" || m.guildRole === "lider";
 }
 
 export const unauthorized = () =>

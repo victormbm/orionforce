@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { authenticate, forbidden, isManager, unauthorized } from "@/lib/auth";
+import { authenticate, canLead, forbidden, unauthorized } from "@/lib/auth";
 import { getSql } from "@/lib/db";
 
-const VALID = ["recruta", "membro", "oficial", "lider"];
+const VALID = ["recruta", "membro", "oficial", "vice", "lider"];
 
 export async function PATCH(
   req: Request,
@@ -10,7 +10,8 @@ export async function PATCH(
 ) {
   const me = await authenticate(req);
   if (!me) return unauthorized();
-  if (!isManager(me)) return forbidden();
+  // Mudar cargos: apenas Líder e Vice-Líder.
+  if (!canLead(me)) return forbidden();
   const { id } = await params;
   const { role } = await req.json();
   if (!VALID.includes(role)) {

@@ -7,10 +7,16 @@ import { PanelTopbar } from "@/components/PanelTopbar";
 import { getClass } from "@/data/classes";
 import { GUILD_ROLE_INFO } from "@/data/roles";
 import { membersRepo, type GuildRole, type PublicMember } from "@/lib/members";
-import { canManage } from "@/lib/permissions";
+import { canManage, canLead } from "@/lib/permissions";
 import { getSession } from "@/lib/session";
 
-const ROLE_ORDER: GuildRole[] = ["recruta", "membro", "oficial", "lider"];
+const ROLE_ORDER: GuildRole[] = [
+  "recruta",
+  "membro",
+  "oficial",
+  "vice",
+  "lider",
+];
 
 export default function LeadershipPage() {
   const router = useRouter();
@@ -64,6 +70,7 @@ export default function LeadershipPage() {
     }
   };
 
+  const iCanLead = canLead(me.guildRole);
   const pendings = members.filter((m) => m.status === "pendente");
   const approved = members.filter((m) => m.status === "aprovado");
 
@@ -126,13 +133,15 @@ export default function LeadershipPage() {
                         >
                           Aprovar
                         </button>
-                        <button
-                          className="of-btn-ghost"
-                          style={{ borderColor: "#e5484d", color: "#e5484d" }}
-                          onClick={() => remove(m.id, m.nickname)}
-                        >
-                          Recusar
-                        </button>
+                        {iCanLead && (
+                          <button
+                            className="of-btn-ghost"
+                            style={{ borderColor: "#e5484d", color: "#e5484d" }}
+                            onClick={() => remove(m.id, m.nickname)}
+                          >
+                            Recusar
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -186,7 +195,7 @@ export default function LeadershipPage() {
                       className="of-input of-select cursor-pointer pr-8 text-sm"
                       style={{ padding: "0.5rem 2rem 0.5rem 0.7rem" }}
                       value={m.guildRole}
-                      disabled={isSelf}
+                      disabled={isSelf || !iCanLead}
                       onChange={(e) =>
                         changeRole(m.id, e.target.value as GuildRole)
                       }
@@ -210,14 +219,16 @@ export default function LeadershipPage() {
                       Resetar PIN
                     </button>
                   )}
-                  <button
-                    className="of-btn-ghost shrink-0"
-                    style={{ borderColor: "#e5484d", color: "#e5484d" }}
-                    disabled={isSelf}
-                    onClick={() => remove(m.id, m.nickname)}
-                  >
-                    Remover
-                  </button>
+                  {iCanLead && (
+                    <button
+                      className="of-btn-ghost shrink-0"
+                      style={{ borderColor: "#e5484d", color: "#e5484d" }}
+                      disabled={isSelf}
+                      onClick={() => remove(m.id, m.nickname)}
+                    >
+                      Remover
+                    </button>
+                  )}
                 </div>
               );
             })}

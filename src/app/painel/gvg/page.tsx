@@ -8,7 +8,7 @@ import { getClass, ROLE_COLOR, type Role } from "@/data/classes";
 import { characterRepo, type CharacterSummary } from "@/lib/character";
 import { gvgRepo, type GvgGroup } from "@/lib/gvg";
 import { membersRepo, type PublicMember } from "@/lib/members";
-import { canManage } from "@/lib/permissions";
+import { canLead } from "@/lib/permissions";
 import { getSession } from "@/lib/session";
 import { formatValue } from "@/lib/format";
 
@@ -43,7 +43,7 @@ export default function GvgPage() {
       router.replace("/");
       return;
     }
-    if (!canManage(session.guildRole)) {
+    if (!canLead(session.guildRole)) {
       router.replace("/painel");
       return;
     }
