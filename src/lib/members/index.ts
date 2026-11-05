@@ -11,7 +11,7 @@ import type { MembersRepository } from "./types";
  * Quando o banco estiver pronto, basta mudar a variável no .env
  * (ou nas Environment Variables do Vercel). A tela não muda.
  */
-const backend = process.env.NEXT_PUBLIC_DATA_BACKEND ?? "local";
+const backend = process.env.NEXT_PUBLIC_DATA_BACKEND === "local" ? "local" : "api";
 
 export const membersRepo: MembersRepository =
   backend === "api" ? apiMembersRepo : localMembersRepo;
