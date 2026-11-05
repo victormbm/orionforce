@@ -84,6 +84,12 @@ export const apiMembersRepo: MembersRepository = {
       body: JSON.stringify({ discord }),
     }),
 
+  setClass: (id, classId) =>
+    request<PublicMember>(`/api/members/${id}/class`, {
+      method: "PATCH",
+      body: JSON.stringify({ classId }),
+    }),
+
   changePin: async (id, currentPin, newPin) => {
     await request(`/api/members/${id}/pin`, {
       method: "PATCH",

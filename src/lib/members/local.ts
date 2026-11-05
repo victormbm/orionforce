@@ -147,6 +147,15 @@ export const localMembersRepo: MembersRepository = {
     return pin;
   },
 
+  async setClass(id, classId) {
+    const all = readAll();
+    const member = all.find((m) => m.id === id);
+    if (!member) throw new AuthError("NOT_FOUND", "Membro não encontrado.");
+    member.classId = classId;
+    writeAll(all);
+    return toPublic(member);
+  },
+
   async setDiscord(id, discord) {
     const all = readAll();
     const member = all.find((m) => m.id === id);

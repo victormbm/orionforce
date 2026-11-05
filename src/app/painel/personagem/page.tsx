@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ClassIcon } from "@/components/ClassIcon";
 import { PanelTopbar } from "@/components/PanelTopbar";
-import { getClass } from "@/data/classes";
+import { CLASSES, getClass } from "@/data/classes";
 import {
   ATTR_FIELDS,
   ATTR_SECTIONS,
@@ -36,6 +36,7 @@ export default function CharacterPage() {
   const [discord, setDiscord] = useState("");
   const [pinCur, setPinCur] = useState("");
   const [pinNew, setPinNew] = useState("");
+  const [classSel, setClassSel] = useState("");
 
   useEffect(() => {
     const session = getSession();
@@ -45,6 +46,7 @@ export default function CharacterPage() {
     }
     setMe(session);
     setDiscord(session.discord ?? "");
+    setClassSel(session.classId);
     Promise.all([
       characterRepo.get(session.id),
       characterRepo.listSnapshots(session.id),
@@ -142,6 +144,21 @@ export default function CharacterPage() {
     setSession(updated);
     setMe(updated);
     setFeedback({ type: "ok", text: "Discord atualizado!" });
+  };
+
+  const handleSaveClass = async () => {
+    if (!me) return;
+    try {
+      const updated = await membersRepo.setClass(me.id, classSel);
+      setSession(updated);
+      setMe(updated);
+      setFeedback({ type: "ok", text: "Classe atualizada!" });
+    } catch (e) {
+      setFeedback({
+        type: "error",
+        text: e instanceof Error ? e.message : "Erro ao salvar a classe.",
+      });
+    }
   };
 
   const handleChangePin = async () => {
@@ -257,6 +274,40 @@ export default function CharacterPage() {
               disabled={(discord.trim() || "") === (me.discord ?? "")}
             >
               Salvar Discord
+            </button>
+          </div>
+        </section>
+
+        {/* Editar classe */}
+        <section className="of-section mt-4 p-5">
+          <h2 className="of-label" style={{ color: "var(--of-primary)" }}>
+            Classe do personagem
+          </h2>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <ClassIcon gameClass={getClass(classSel) ?? CLASSES[0]} size={44} />
+            <div className="relative" style={{ minWidth: 220 }}>
+              <select
+                className="of-input of-select cursor-pointer pr-9"
+                value={classSel}
+                onChange={(e) => setClassSel(e.target.value)}
+              >
+                {CLASSES.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name} [{c.role}]
+                  </option>
+                ))}
+              </select>
+              <span className="of-select-arrow" aria-hidden>
+                ▾
+              </span>
+            </div>
+            <button
+              className="of-cta"
+              style={{ width: "auto", marginTop: 0 }}
+              onClick={handleSaveClass}
+              disabled={classSel === me.classId}
+            >
+              Salvar classe
             </button>
           </div>
         </section>

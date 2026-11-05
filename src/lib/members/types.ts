@@ -75,6 +75,8 @@ export interface MembersRepository {
   remove(id: string): Promise<void>;
   /** Vincula/atualiza a tag do Discord do membro. */
   setDiscord(id: string, discord: string): Promise<PublicMember>;
+  /** Altera a classe do personagem. */
+  setClass(id: string, classId: string): Promise<PublicMember>;
   /** Troca o próprio PIN (exige o PIN atual). */
   changePin(id: string, currentPin: string, newPin: string): Promise<void>;
   /** Reset de PIN pela liderança: gera um PIN temporário e o retorna. */
