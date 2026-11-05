@@ -51,7 +51,6 @@ export function PanelTopbar({ me }: { me: PublicMember }) {
     { href: "/painel/personagem", label: t("Meu Personagem") },
     { href: "/painel/eventos", label: t("Eventos") },
     { href: "/painel/avisos", label: t("Avisos") },
-    { href: "/painel/leilao", label: t("Leilão") },
     ...(canLead(me.guildRole)
       ? [{ href: "/painel/gvg", label: "GvG" }]
       : []),
