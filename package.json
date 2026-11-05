@@ -10,7 +10,8 @@
     "test:i18n": "node --test scripts/i18n.test.cjs",
     "test:gvg": "node --test scripts/gvg.test.cjs",
     "migrate:gvg": "node --env-file=.env.local scripts/migrate-gvg-parties.mjs",
-    "test:loading": "node --test scripts/loading.test.cjs"
+    "test:loading": "node --test scripts/loading.test.cjs",
+    "test:calculator": "node --test scripts/raw-defense.test.cjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
