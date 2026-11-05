@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { authenticate, forbidden, isManager, unauthorized } from "@/lib/auth";
 import { getSql } from "@/lib/db";
 import { hashPin } from "@/lib/members/hash";
+import { clearFailures, registerFailure, secondsBlocked } from "@/lib/rate-limit";
 
 export async function PATCH(
   req: Request,
@@ -15,6 +16,20 @@ export async function PATCH(
 
   // Troca do próprio PIN: exige o PIN atual.
   if (me.id === id) {
+    // Rate limit por conta contra brute-force do PIN atual.
+    const throttleKey = `pin:${id}`;
+    const blocked = await secondsBlocked(throttleKey);
+    if (blocked > 0) {
+      const min = Math.ceil(blocked / 60);
+      return NextResponse.json(
+        {
+          code: "RATE_LIMITED",
+          message: `Muitas tentativas. Tente novamente em ${min} min.`,
+        },
+        { status: 429 }
+      );
+    }
+
     if (!/^\d{4}$/.test(String(newPin ?? ""))) {
       return NextResponse.json(
         { code: "INVALID_INPUT", message: "O novo PIN deve ter 4 dígitos." },
@@ -29,11 +44,13 @@ export async function PATCH(
       );
     }
     if (rows[0].pin_hash !== (await hashPin(String(currentPin)))) {
+      await registerFailure(throttleKey);
       return NextResponse.json(
         { code: "WRONG_PIN", message: "PIN atual incorreto." },
         { status: 401 }
       );
     }
+    await clearFailures(throttleKey);
     await sql`UPDATE members SET pin_hash = ${await hashPin(
       String(newPin)
     )} WHERE id = ${id}`;
